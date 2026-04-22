@@ -16,3 +16,7 @@ wheels/
 .zed
 
 /*.zip
+.pytest_cache/
+.ruff_cache/
+.ty_cache/
+.mypy_cache/
