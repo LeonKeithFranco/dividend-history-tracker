@@ -5,8 +5,8 @@ description = "Backend of the Dividend History Tracker"
 requires-python = ">=3.12"
 dependencies = [
     "aiosqlite>=0.22.1",
+    "beautifulsoup4>=4.14.3",
     "fastapi[standard]>=0.136.0",
-    "pwdlib>=0.3.0",
-    "pyjwt>=2.12.1",
+    "selenium>=4.43.0",
     "sqlalchemy>=2.0.49",
 ]
