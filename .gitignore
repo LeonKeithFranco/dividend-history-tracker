@@ -12,7 +12,7 @@ wheels/
 .env
 *.db
 
-.vsocde
+.vscode
 .zed
 
-*.zip
+/*.zip
