@@ -1,0 +1,20 @@
+[project]
+name = "dividend-history"
+version = "0.1.0"
+description = "Dividend history tracker"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "backend",
+    "frontend",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "ruff>=0.15.11",
+    "ty>=0.0.32",
+]
