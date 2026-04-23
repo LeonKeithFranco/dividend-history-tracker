@@ -1,7 +1,7 @@
 from typing import Literal, Self, cast
 
 from selenium import webdriver
-from selenium.webdriver import chrome, firefox
+from selenium.webdriver import ActionChains, chrome, firefox
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -126,7 +126,7 @@ class SeleniumWrapper:
         return element.is_enabled()
 
     def click_element(self, by: str, value: str) -> None:
-        """Click on element.
+        """Move to then click on element.
 
         Args:
             by: A locator strategy from selenium.webdriver.common.by.By
@@ -136,4 +136,7 @@ class SeleniumWrapper:
         Raises:
             NoSuchElementException: If no element is found matching the locator.
         """
-        self.find_element_with_wait(by, value).click()
+        element = self.find_element_with_wait(by, value)
+
+        actions = ActionChains(self.driver)
+        actions.move_to_element(element).click().perform()
