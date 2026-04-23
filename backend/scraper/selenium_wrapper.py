@@ -1,4 +1,4 @@
-from typing import Literal, cast
+from typing import Literal, Self, cast
 
 from selenium import webdriver
 from selenium.webdriver import chrome, firefox
@@ -19,7 +19,7 @@ class SeleniumWrapper:
         driver: The underlying Selenium WebDriver instance.
     """
 
-    def __init__(self, browser: Literal["chrome", "firefox"] = "chrome"):
+    def __init__(self, browser: Literal["chrome", "firefox"] = "chrome") -> None:
         """Initialized the Selenium wrapper with the specified browser.
 
         Args:
@@ -44,7 +44,7 @@ class SeleniumWrapper:
 
         self.driver: _WebDriver = driver
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         """Enter the context manager.
 
         Returns:
@@ -52,7 +52,7 @@ class SeleniumWrapper:
         """
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> bool:
         """Exit the context manager and close the browser.
 
         Args:
@@ -66,7 +66,7 @@ class SeleniumWrapper:
         self.driver.quit()
         return False
 
-    def open_page(self, url: str):
+    def open_page(self, url: str) -> None:
         """Navigate to the specified URL in the browser.
 
         Args:
