@@ -107,3 +107,33 @@ class SeleniumWrapper:
         """
         element = self.find_element_with_wait(by, value)
         return cast(str, element.get_attribute("outerHTML"))
+
+    def is_element_enabled(self, by: str, value: str) -> bool:
+        """Check if the element is enabled.
+
+        Args:
+            by: A locator strategy from selenium.webdriver.common.by.By
+                (e.g, By.ID, By.XPATH, By.CSS_SELECTOR).
+            value: The locator value used with the specified strategy.
+
+        Returns:
+            bool: Bool representing whether the element is enabled or not.
+
+        Raises:
+            NoSuchElementException: If no element is found matching the locator.
+        """
+        element = self.find_element_with_wait(by, value)
+        return element.is_enabled()
+
+    def click_element(self, by: str, value: str) -> None:
+        """Click on element.
+
+        Args:
+            by: A locator strategy from selenium.webdriver.common.by.By
+                (e.g, By.ID, By.XPATH, By.CSS_SELECTOR).
+            value: The locator value used with the specified strategy.
+
+        Raises:
+            NoSuchElementException: If no element is found matching the locator.
+        """
+        self.find_element_with_wait(by, value).click()
