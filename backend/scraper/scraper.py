@@ -1,0 +1,283 @@
+import re
+from dataclasses import dataclass, field
+from datetime import date, datetime
+from decimal import Decimal
+from typing import cast
+
+from bs4 import BeautifulSoup
+
+from scraper.page import DividendHistoryPage
+from scraper.selenium_wrapper import SeleniumWrapper
+
+
+@dataclass(frozen=True, slots=True)
+class StockInfo:
+    """Information about a stock."""
+
+    company_name: str
+    ticker_symbol: str
+    exchange: str
+
+
+@dataclass(frozen=True, slots=True)
+class DividendMetrics:
+    """Metrics related to a stocks dividend history."""
+
+    yield_: float
+    pay_out_ratio: float
+    frequency: str
+    annual_dividend: Decimal
+    next_ex_dividend_date: date
+    next_payout_date: date
+
+
+@dataclass(frozen=True, slots=True)
+class DividendEvent:
+    """A single dividend history event."""
+
+    ex_dividend_date: date
+    payout_date: date
+    cash_amount: Decimal
+    pct_change: float | None
+
+
+@dataclass(frozen=True, slots=True)
+class DividendHistory:
+    """A collection of dividend events."""
+
+    dividend_events: list[DividendEvent] = field(default_factory=list)
+
+
+_DATE_FORMAT = "%Y-%m-%d"
+
+
+def _extract(val: str, pattern: str) -> str | None:
+    """Extract a substring matching a regex pattern.
+
+    Args:
+        val: The string to search.
+        pattern: The regex pattern to match.
+
+    Returns:
+        str: The matched substring, or None if no match is found.
+    """
+    match = re.search(
+        pattern=pattern,
+        string=val,
+    )
+
+    return match.group() if match is not None else None
+
+
+def _extract_number(val: str) -> str | None:
+    """Extract a numeric value, including decimals, from a string.
+
+    Args:
+        val: The string to search.
+
+    Returns:
+        str: The extracted numeric value as a string, or None if no
+            match is found.
+    """
+    return _extract(val=val, pattern=r"-?\d+\.\d+")
+
+
+def _extract_date(val: str) -> str | None:
+    """Extract a date substring with the format YYYY-MM-DD from a string.
+
+    Args:
+        val: The string to search.
+
+    Returns:
+        str: The extract date substring, or None if no match is found.
+    """
+    return _extract(val=val, pattern=r"\d{4}-\d{2}-\d{2}")
+
+
+def _parse_pct_change(val: str) -> float | None:
+    """Parse a percentage from the "% Change" column of the dividend history table.
+
+    Args:
+        val: The string to search.
+
+    Returns:
+        float: The parsed percentage value as a string, or None if val is empty,
+            or if not match is found.
+    """
+    if val == "":
+        return None
+
+    num = _extract_number(val)
+
+    return float(num) if num is not None else None
+
+
+def _parse_pct(val: str) -> float:
+    """Parse a percentage value from a string.
+
+    Args:
+        val: The string to parse. Must contain a numeric value.
+
+    Raises:
+        ValueError: If no numeric value can be extracted from the string.
+    """
+    return float(cast(str, _extract_number(val)))
+
+
+def _parse_cash_amount(val: str) -> Decimal:
+    """Parse a cash amount from a string.
+
+    Args:
+        val: The string to parse. Must contain a numeric value.
+
+    Returns:
+        Decimal: The parsed cash amount.
+
+    Raises:
+        ValueError: If no numeric value can be extracted from the string.
+    """
+    return Decimal(cast(str, _extract_number(val)))
+
+
+def _get_stock_info(stock_info_html) -> StockInfo:
+    """Get stock information from HTML.
+
+    Args:
+        stock_info_html: The HTML string containing stock information.
+
+    Returns:
+        StockInfo: A StockInfo object with the extracted company name,
+            ticker symbol, and exchange.
+    """
+    stock_info_soup = BeautifulSoup(stock_info_html, "html.parser")
+
+    stock_strings = list(stock_info_soup.stripped_strings)
+
+    return StockInfo(
+        company_name=stock_strings[0],
+        ticker_symbol=stock_strings[1],
+        exchange=stock_strings[2],
+    )
+
+
+def _get_dividend_metrics(dividend_metrics_table_html: str) -> DividendMetrics:
+    """Extract dividen metrics from a table HTML.
+
+    Args:
+        dividend_metrics_table_html: The HTML string containing the dividend
+            metrics table.
+
+    Returns:
+        DividendMetrics: A DividendMetrics object with the extracted yield,
+            payout ratio, frequency, annual dividend, and the next dividend
+            dates.
+    """
+    dividend_metrics_table_soup = BeautifulSoup(
+        dividend_metrics_table_html, "html.parser"
+    )
+
+    metrics_text = [
+        metric.text.strip() for metric in dividend_metrics_table_soup.find_all("dd")
+    ]
+
+    return DividendMetrics(
+        yield_=_parse_pct(metrics_text[0]),
+        pay_out_ratio=_parse_pct(metrics_text[2]),
+        frequency=metrics_text[3],
+        annual_dividend=_parse_cash_amount(metrics_text[4]),
+        next_ex_dividend_date=datetime.strptime(
+            cast(str, _extract_date(metrics_text[5])),
+            _DATE_FORMAT,
+        ).date(),
+        next_payout_date=datetime.strptime(
+            cast(str, _extract_date(metrics_text[6])),
+            _DATE_FORMAT,
+        ).date(),
+    )
+
+
+def _get_dividend_history(dividend_events_table_html: str) -> DividendHistory:
+    """Extract dividend history events from table HTML.
+
+    Args:
+        DividendHistory: A Dividend History object containing the extracted dividend
+            events.
+    """
+    history = DividendHistory()
+
+    dividend_history_table_soup = BeautifulSoup(
+        dividend_events_table_html, "html.parser"
+    )
+    for row in dividend_history_table_soup.find_all("div", class_="tabulator-row"):
+        cells_text = [
+            cell.text.strip() for cell in row.find_all("div", class_="tabulator-cell")
+        ]
+
+        history.dividend_events.append(
+            DividendEvent(
+                ex_dividend_date=datetime.strptime(cells_text[0], _DATE_FORMAT).date(),
+                payout_date=datetime.strptime(cells_text[1], _DATE_FORMAT).date(),
+                cash_amount=_parse_cash_amount(cells_text[2]),
+                pct_change=_parse_pct_change(cells_text[3]),
+            )
+        )
+
+    return history
+
+
+def get_dividend_info(
+    ticker: str,
+) -> tuple[StockInfo, DividendMetrics, DividendHistory]:
+    """Retrieve comprehensive dividend information for a given stock ticker.
+
+    Thie functions automates the scraping of the dividend history page from the
+    corresponding page on dividendhistory.org. Scraps the stock details, dividend
+    metrics table, and dividen history table. Handles pagination automatically.
+
+    Args:
+        ticker: The ticker symbol of to retrieve dividend information for.
+
+    Returns:
+        tuple:
+            - StockInfo: Information about the stock
+            - DividendMetrics: Current dividend metrics and upcoming dividend dates.
+            - DividendHistory: Complete historical record of dividend events.
+    """
+    DIVIDEND_HISTORY_URL = f"https://dividendhistory.org/payout/{ticker.upper()}/"
+
+    with SeleniumWrapper() as driver:
+        driver.open_page(DIVIDEND_HISTORY_URL)
+
+        dividend_history_page = DividendHistoryPage(driver)
+
+        stock_info_html = dividend_history_page.get_stock_info_html()
+
+        dividend_metrics_table_html = (
+            dividend_history_page.get_dividend_metrics_table_html()
+        )
+
+        stock_info = _get_stock_info(stock_info_html)
+        dividend_metrics = _get_dividend_metrics(dividend_metrics_table_html)
+
+        dividend_events_table_html = (
+            dividend_history_page.get_dividend_events_table_html()
+        )
+        dividend_history = _get_dividend_history(dividend_events_table_html)
+
+        while dividend_history_page.is_next_button_enabled():
+            dividend_history_page.click_next_button()
+
+            dividend_events_table_html = (
+                dividend_history_page.get_dividend_events_table_html()
+            )
+            dividend_history.dividend_events.extend(
+                _get_dividend_history(dividend_events_table_html).dividend_events
+            )
+
+    return (stock_info, dividend_metrics, dividend_history)
+
+
+if __name__ == "__main__":
+    from pprint import pprint
+
+    pprint(get_dividend_info("KO"))
