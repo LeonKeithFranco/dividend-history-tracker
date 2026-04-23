@@ -48,7 +48,7 @@ class SeleniumWrapper:
         """Enter the context manager.
 
         Returns:
-            The SeleniumWrapper instance itself.
+            SeleniumWrapper: The SeleniumWrapper instance itself.
         """
         return self
 
@@ -61,7 +61,7 @@ class SeleniumWrapper:
             exc_tb: The exception traceback if an exception occurred, None otherwise.
 
         Returns:
-            False to propagate exceptions.
+            bool: False to propagate exceptions.
         """
         self.driver.quit()
         return False
@@ -78,7 +78,7 @@ class SeleniumWrapper:
         """The the full HTML source of the current page.
 
         Returns:
-            The entire HTML of the page as a string.
+            str: The entire HTML of the page as a string.
         """
         return self.driver.page_source
 
@@ -100,7 +100,7 @@ class SeleniumWrapper:
             value: The locator value used with the specified strategy.
 
         Returns:
-            The outer HTML of the located element as a string.
+            str: The outer HTML of the located element as a string.
 
         Raises:
             NoSuchElementException: If no element is found matching the locator.
