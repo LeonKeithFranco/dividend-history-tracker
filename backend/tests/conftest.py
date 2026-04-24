@@ -36,7 +36,7 @@ def local_web_server() -> Iterator[str]:
     is cleaned up at the end of the test.
 
     Yields:
-        str: The url of the local web server hosting the AAPL dividen history
+        str: The url of the local web server hosting the AAPL dividend history
              page.
     """
     webpage_folder = Path(__file__).parent / "fixtures" / "dividendhistory_aapl_page"

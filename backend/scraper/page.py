@@ -15,7 +15,7 @@ class DividendHistoryPage:
     """
 
     _STOCK_INFO_XPATH = "//h1[contains(@class, 'title-with-badge')]"
-    _DIVIDEN_METRICS_TABLE_XPATH = "//h2[text()='Dividend Metrics']/../..//dl"
+    _DIVIDEND_METRICS_TABLE_XPATH = "//h2[text()='Dividend Metrics']/../..//dl"
     _DIVIDEND_HISTORY_TABLE_XPATH = "//div[@id='tabulator-table-body']"
     _NEXT_BUTTON_XPATH = "//button[@title='Next Page']"
 
@@ -47,7 +47,7 @@ class DividendHistoryPage:
         Raises:
             NoSuchElementException: If the dividend metrics table is not found.
         """
-        return self.driver.get_html(By.XPATH, self._DIVIDEN_METRICS_TABLE_XPATH)
+        return self.driver.get_html(By.XPATH, self._DIVIDEND_METRICS_TABLE_XPATH)
 
     def get_dividend_events_table_html(self) -> str:
         """Get the HTML of the dividend history events table.
