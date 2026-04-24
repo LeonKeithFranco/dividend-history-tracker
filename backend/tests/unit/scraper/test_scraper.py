@@ -5,8 +5,24 @@ from pathlib import Path
 
 import pytest
 from pytest_mock import MockFixture
+from selenium.common import (
+    StaleElementReferenceException,
+    TimeoutException,
+    WebDriverException,
+)
 
-from scraper.scraper import DividendEvent, DividendHistory, get_dividend_info
+import scraper.scraper as scraper_module
+from scraper import DividendEvent, DividendHistory, get_dividend_info
+from scraper.errors import (
+    ParseError,
+    ScraperTimeoutError,
+    ScraperUnavailableError,
+    TickerHasNoDividends,
+    TickerNotFoundError,
+)
+from scraper.page import DividendHistoryPage
+from scraper.scraper import _MAX_RETRIES, DividendMetrics, StockInfo
+from scraper.selenium_wrapper import SeleniumWrapper
 
 
 @pytest.fixture
@@ -137,3 +153,171 @@ class TestScraper:
             _aapl_dividend_history_from_json.dividend_events,
         ):
             assert actual_event == expected_event
+
+
+class TestScraperOpenPage:
+    """Failure-mode tests for the open_page call.
+
+    These tests mock SeleniumWrapper.open_page so that no real browser starts and no real
+    network request is made. Each test controls what the mocked open_page does (raise,
+    raise-then-succeed, etc) and then asserts how get_dividend_info behaves on top of it.
+    """
+
+    def test_open_page_raises_scraper_timeout_after_exhausting_retries(
+        self, mocker: MockFixture
+    ):
+        mocker.patch("scraper.scraper.time.sleep")
+
+        mock_open_page = mocker.patch(
+            "scraper.selenium_wrapper.SeleniumWrapper.open_page"
+        )
+        mock_open_page.side_effect = TimeoutException("fake timeout")
+
+        with pytest.raises(ScraperTimeoutError) as exc_info:
+            get_dividend_info("AAPL")
+
+        assert isinstance(exc_info.value.__cause__, TimeoutException)
+
+        assert mock_open_page.call_count == _MAX_RETRIES
+
+    def test_open_page_raises_scraper_unavailable_on_webdriver_error(
+        self, mocker: MockFixture
+    ):
+        mocker.patch("scraper.scraper.time.sleep")
+
+        mock_open_page = mocker.patch(
+            "scraper.selenium_wrapper.SeleniumWrapper.open_page"
+        )
+        mock_open_page.side_effect = WebDriverException("fake driver error")
+
+        with pytest.raises(ScraperUnavailableError) as exc_info:
+            get_dividend_info("AAPL")
+
+        assert isinstance(exc_info.value.__cause__, WebDriverException)
+        assert mock_open_page.call_count == _MAX_RETRIES
+
+    def test_open_page_succeeds_after_transient_timeout(self, mocker: MockFixture):
+        mocker.patch("scraper.scraper.time.sleep")
+
+        mock_open_page = mocker.patch(
+            "scraper.selenium_wrapper.SeleniumWrapper.open_page"
+        )
+        mock_open_page.side_effect = [TimeoutException("1"), None]
+
+        sentinel_stock_info = StockInfo(
+            company_name="Apple", ticker_symbol="AAPL", exchange="Nasdaq"
+        )
+        sentinel_metrics = DividendMetrics(
+            yield_=0.38,
+            pay_out_ratio=13.16,
+            frequency="Quarterly",
+            annual_dividend=Decimal("1.04"),
+            next_ex_dividend_date=date(2026, 5, 12),
+            next_payout_date=date(2026, 5, 15),
+        )
+        sentinel_history = DividendHistory(dividend_events=[])
+
+        mocker.patch.object(
+            scraper_module, "_get_stock_info", return_value=sentinel_stock_info
+        )
+        mocker.patch.object(
+            scraper_module, "_get_dividend_metrics", return_value=sentinel_metrics
+        )
+        mocker.patch.object(
+            scraper_module,
+            "_get_complete_dividend_history",
+            return_value=sentinel_history,
+        )
+
+        stock_info, dividend_metrics, dividend_history = get_dividend_info("AAPL")
+
+        assert mock_open_page.call_count == 2
+        assert stock_info is sentinel_stock_info
+        assert dividend_metrics is sentinel_metrics
+        assert dividend_history is sentinel_history
+
+    def test_stock_info_timeout_raises_ticker_not_found(self, mocker: MockFixture):
+        mocker.patch.object(SeleniumWrapper, "open_page")
+        mock_get_stock_info_html = mocker.patch.object(
+            DividendHistoryPage,
+            "get_stock_info_html",
+            side_effect=TimeoutException("stock info not found"),
+        )
+
+        with pytest.raises(TickerNotFoundError):
+            get_dividend_info("FAKE")
+
+        assert mock_get_stock_info_html.call_count == 1
+
+
+class TestStockMetrics:
+    def test_metrics_timeout_raises_ticker_has_no_dividends(self, mocker: MockFixture):
+        mocker.patch.object(SeleniumWrapper, "open_page")
+        mocker.patch.object(
+            DividendHistoryPage,
+            "get_stock_info_html",
+            return_value=(
+                "<h1 class='title-with-badge'>"
+                "<span>Berkshire Hathaway</span><span>BRK.A</span><span>NYSE</span>"
+                "</h1>"
+            ),
+        )
+        mock_get_dividend_metrics_table_html = mocker.patch.object(
+            DividendHistoryPage,
+            "get_dividend_metrics_table_html",
+            side_effect=TimeoutException("metrics table not found"),
+        )
+
+        with pytest.raises(TickerHasNoDividends):
+            get_dividend_info("BRK.A")
+
+        assert mock_get_dividend_metrics_table_html.call_count == 1
+
+
+class TestStaleElements:
+    def test_stale_element_retries_then_raises_parse_error(self, mocker: MockFixture):
+        mocker.patch.object(SeleniumWrapper, "open_page")
+        mock_get_stock_info = mocker.patch.object(
+            scraper_module,
+            "_get_stock_info",
+            side_effect=StaleElementReferenceException("stale element"),
+        )
+
+        with pytest.raises(ParseError):
+            get_dividend_info("AAPL")
+
+        assert mock_get_stock_info.call_count == _MAX_RETRIES
+
+    def test_stale_element_recovers_on_retry(self, mocker: MockFixture):
+        mocker.patch.object(SeleniumWrapper, "open_page")
+
+        sentinel_stock_info = StockInfo(
+            company_name="Apple", ticker_symbol="AAPL", exchange="Nasdaq"
+        )
+        sentinel_metrics = DividendMetrics(
+            yield_=0.38,
+            pay_out_ratio=13.16,
+            frequency="Quarterly",
+            annual_dividend=Decimal("1.04"),
+            next_ex_dividend_date=date(2026, 5, 12),
+            next_payout_date=date(2026, 5, 15),
+        )
+        sentinel_history = DividendHistory(dividend_events=[])
+
+        mocker.patch.object(
+            scraper_module,
+            "_get_stock_info",
+            side_effect=[StaleElementReferenceException("1"), sentinel_stock_info],
+        )
+        mocker.patch.object(
+            scraper_module, "_get_dividend_metrics", return_value=sentinel_metrics
+        )
+        mocker.patch.object(
+            scraper_module,
+            "_get_complete_dividend_history",
+            return_value=sentinel_history,
+        )
+
+        stock_info, _, _ = get_dividend_info("AAPL")
+
+        assert stock_info is sentinel_stock_info
