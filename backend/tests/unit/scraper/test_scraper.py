@@ -320,6 +320,6 @@ class TestStaleElements:
 
         stock_info, _, _ = get_dividend_info("AAPL")
 
-        mock_get_stock_info.call_count == 2
+        assert mock_get_stock_info.call_count == 2
 
         assert stock_info is sentinel_stock_info
