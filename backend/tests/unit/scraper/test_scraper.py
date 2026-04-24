@@ -304,7 +304,7 @@ class TestStaleElements:
         )
         sentinel_history = DividendHistory(dividend_events=[])
 
-        mocker.patch.object(
+        mock_get_stock_info = mocker.patch.object(
             scraper_module,
             "_get_stock_info",
             side_effect=[StaleElementReferenceException("1"), sentinel_stock_info],
@@ -319,5 +319,7 @@ class TestStaleElements:
         )
 
         stock_info, _, _ = get_dividend_info("AAPL")
+
+        mock_get_stock_info.call_count == 2
 
         assert stock_info is sentinel_stock_info
