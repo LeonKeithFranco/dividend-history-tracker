@@ -18,9 +18,16 @@ dev = [
     "pytest-mock>=3.15.1",
     "ruff>=0.15.11",
     "ty>=0.0.32",
+    "typos>=1.45.1",
 ]
 
 [tool.pytest.ini_options]
 markers = [
     "live: mark test as requiring live external services",
+]
+
+[tool.typos.files]
+extend-exclude = [
+    "backend/tests/fixtures/",
+    "uv.lock",
 ]
