@@ -380,9 +380,3 @@ def get_dividend_info(
                 raise ParseError("could not parse element on page") from e
 
     return (stock_info, dividend_metrics, dividend_history)
-
-
-if __name__ == "__main__":
-    from pprint import pprint
-
-    pprint(get_dividend_info("KO"))
