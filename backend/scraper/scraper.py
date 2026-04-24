@@ -1,11 +1,24 @@
 import re
+import time
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from decimal import Decimal
 from typing import cast
 
 from bs4 import BeautifulSoup
+from selenium.common import (
+    StaleElementReferenceException,
+    TimeoutException,
+    WebDriverException,
+)
 
+from scraper.errors import (
+    ParseError,
+    ScraperTimeoutError,
+    ScraperUnavailableError,
+    TickerHasNoDividends,
+    TickerNotFoundError,
+)
 from scraper.page import DividendHistoryPage
 from scraper.selenium_wrapper import SeleniumWrapper
 
@@ -49,6 +62,7 @@ class DividendHistory:
 
 
 _DATE_FORMAT = "%Y-%m-%d"
+_MAX_RETRIES = 3
 
 
 def _extract(val: str, pattern: str) -> str | None:
@@ -139,7 +153,7 @@ def _parse_cash_amount(val: str) -> Decimal:
     return Decimal(cast(str, _extract_number(val)))
 
 
-def _get_stock_info(stock_info_html) -> StockInfo:
+def _get_stock_info(dividend_history_page: DividendHistoryPage) -> StockInfo:
     """Get stock information from HTML.
 
     Args:
@@ -149,6 +163,11 @@ def _get_stock_info(stock_info_html) -> StockInfo:
         StockInfo: A StockInfo object with the extracted company name,
             ticker symbol, and exchange.
     """
+    try:
+        stock_info_html = dividend_history_page.get_stock_info_html()
+    except TimeoutException as e:
+        raise TickerNotFoundError from e
+
     stock_info_soup = BeautifulSoup(stock_info_html, "html.parser")
 
     stock_strings = list(stock_info_soup.stripped_strings)
@@ -160,7 +179,9 @@ def _get_stock_info(stock_info_html) -> StockInfo:
     )
 
 
-def _get_dividend_metrics(dividend_metrics_table_html: str) -> DividendMetrics:
+def _get_dividend_metrics(
+    dividend_history_page: DividendHistoryPage,
+) -> DividendMetrics:
     """Extract dividend metrics from a table HTML.
 
     Args:
@@ -172,6 +193,15 @@ def _get_dividend_metrics(dividend_metrics_table_html: str) -> DividendMetrics:
             payout ratio, frequency, annual dividend, and the next dividend
             dates.
     """
+    try:
+        dividend_metrics_table_html = (
+            dividend_history_page.get_dividend_metrics_table_html()
+        )
+    except TimeoutException as e:
+        raise TickerHasNoDividends(
+            "Stock has no associated dividends or metrics table has not loaded"
+        ) from e
+
     dividend_metrics_table_soup = BeautifulSoup(
         dividend_metrics_table_html, "html.parser"
     )
@@ -225,6 +255,48 @@ def _get_dividend_history(dividend_events_table_html: str) -> DividendHistory:
     return history
 
 
+def _get_complete_dividend_history(
+    dividend_history_page: DividendHistoryPage,
+) -> DividendHistory:
+    try:
+        dividend_events_table_html = (
+            dividend_history_page.get_dividend_events_table_html()
+        )
+        dividend_history = _get_dividend_history(dividend_events_table_html)
+        while dividend_history_page.is_next_button_enabled():
+            dividend_history_page.click_next_button()
+
+            dividend_events_table_html = (
+                dividend_history_page.get_dividend_events_table_html()
+            )
+            dividend_history.dividend_events.extend(
+                _get_dividend_history(dividend_events_table_html).dividend_events
+            )
+
+        return dividend_history
+    except TimeoutException as e:
+        raise TickerHasNoDividends(
+            "Stock has no associated dividends or dividend history table has not loaded"
+        ) from e
+
+
+def _open_page(driver: SeleniumWrapper, url: str) -> None:
+    for attempt in range(1, _MAX_RETRIES + 1):
+        try:
+            driver.open_page(url)
+            break
+        except (TimeoutException, WebDriverException) as e:
+            if attempt <= _MAX_RETRIES:
+                time.sleep(2**attempt)
+                continue
+
+            match e:
+                case TimeoutException():
+                    raise ScraperTimeoutError("Page could not load.") from e
+                case WebDriverException():
+                    raise ScraperUnavailableError from e
+
+
 def get_dividend_info(
     ticker: str,
 ) -> tuple[StockInfo, DividendMetrics, DividendHistory]:
@@ -246,33 +318,20 @@ def get_dividend_info(
     DIVIDEND_HISTORY_URL = f"https://dividendhistory.org/payout/{ticker.upper()}/"
 
     with SeleniumWrapper() as driver:
-        driver.open_page(DIVIDEND_HISTORY_URL)
+        _open_page(driver, DIVIDEND_HISTORY_URL)
 
         dividend_history_page = DividendHistoryPage(driver)
 
-        stock_info_html = dividend_history_page.get_stock_info_html()
+        for attempt in range(1, _MAX_RETRIES):
+            try:
+                stock_info = _get_stock_info(dividend_history_page)
+                dividend_metrics = _get_dividend_metrics(dividend_history_page)
+                dividend_history = _get_complete_dividend_history(dividend_history_page)
+            except StaleElementReferenceException as e:
+                if attempt <= _MAX_RETRIES:
+                    continue
 
-        dividend_metrics_table_html = (
-            dividend_history_page.get_dividend_metrics_table_html()
-        )
-
-        stock_info = _get_stock_info(stock_info_html)
-        dividend_metrics = _get_dividend_metrics(dividend_metrics_table_html)
-
-        dividend_events_table_html = (
-            dividend_history_page.get_dividend_events_table_html()
-        )
-        dividend_history = _get_dividend_history(dividend_events_table_html)
-
-        while dividend_history_page.is_next_button_enabled():
-            dividend_history_page.click_next_button()
-
-            dividend_events_table_html = (
-                dividend_history_page.get_dividend_events_table_html()
-            )
-            dividend_history.dividend_events.extend(
-                _get_dividend_history(dividend_events_table_html).dividend_events
-            )
+                raise ParseError("could not parse element on page") from e
 
     return (stock_info, dividend_metrics, dividend_history)
 
