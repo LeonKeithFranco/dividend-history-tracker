@@ -286,7 +286,7 @@ def _open_page(driver: SeleniumWrapper, url: str) -> None:
             driver.open_page(url)
             break
         except (TimeoutException, WebDriverException) as e:
-            if attempt <= _MAX_RETRIES:
+            if attempt < _MAX_RETRIES:
                 time.sleep(2**attempt)
                 continue
 
@@ -322,13 +322,14 @@ def get_dividend_info(
 
         dividend_history_page = DividendHistoryPage(driver)
 
-        for attempt in range(1, _MAX_RETRIES):
+        for attempt in range(1, _MAX_RETRIES + 1):
             try:
                 stock_info = _get_stock_info(dividend_history_page)
                 dividend_metrics = _get_dividend_metrics(dividend_history_page)
                 dividend_history = _get_complete_dividend_history(dividend_history_page)
+                break
             except StaleElementReferenceException as e:
-                if attempt <= _MAX_RETRIES:
+                if attempt < _MAX_RETRIES:
                     continue
 
                 raise ParseError("could not parse element on page") from e

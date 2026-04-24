@@ -35,7 +35,7 @@
         "ex_dividend_date": "2025-05-12",
         "payout_date": "2025-05-15",
         "cash_amount": "0.26",
-        "pct_change": null
+        "pct_change": 4.0
       },
       {
         "ex_dividend_date": "2025-02-10",
