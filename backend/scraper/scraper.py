@@ -230,7 +230,7 @@ def get_dividend_info(
 ) -> tuple[StockInfo, DividendMetrics, DividendHistory]:
     """Retrieve comprehensive dividend information for a given stock ticker.
 
-    Thie function automates the scraping of the dividend history page from the
+    This function automates the scraping of the dividend history page from the
     corresponding page on dividendhistory.org. Scrapes the stock details, dividend
     metrics table, and dividend history table. Handles pagination automatically.
 
