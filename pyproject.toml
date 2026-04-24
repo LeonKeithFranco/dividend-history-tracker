@@ -32,6 +32,7 @@ extend-exclude = [
     "uv.lock",
 ]
 
-# [tool.typos.default.extend-words]
+[tool.typos.default.extend-words]
 # crate = "crate" # supressing false positive
 # teh = "the" # force correction
+dividen = "dividend"
