@@ -4,7 +4,7 @@ from scraper.selenium_wrapper import SeleniumWrapper
 
 
 class DividendHistoryPage:
-    """A page object for interactings with the dividend history page.
+    """A page object for interacting with the dividend history page.
 
     This class provides a simplified interface for extracting and navigating
     the dividend history page using Selenium. Abstracts away usage of XPaths

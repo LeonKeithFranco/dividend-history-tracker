@@ -20,7 +20,7 @@ class SeleniumWrapper:
     """
 
     def __init__(self, browser: Literal["chrome", "firefox"] = "chrome") -> None:
-        """Initialized the Selenium wrapper with the specified browser.
+        """Initialize the Selenium wrapper with the specified browser.
 
         Args:
             browser: The browser to use. Must either be "chrome" or "firefox".
@@ -75,7 +75,7 @@ class SeleniumWrapper:
         self.driver.get(url)
 
     def get_html_page(self) -> str:
-        """The the full HTML source of the current page.
+        """The full HTML source of the current page.
 
         Returns:
             str: The entire HTML of the page as a string.

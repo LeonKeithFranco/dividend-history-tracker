@@ -161,7 +161,7 @@ def _get_stock_info(stock_info_html) -> StockInfo:
 
 
 def _get_dividend_metrics(dividend_metrics_table_html: str) -> DividendMetrics:
-    """Extract dividen metrics from a table HTML.
+    """Extract dividend metrics from a table HTML.
 
     Args:
         dividend_metrics_table_html: The HTML string containing the dividend
@@ -230,9 +230,9 @@ def get_dividend_info(
 ) -> tuple[StockInfo, DividendMetrics, DividendHistory]:
     """Retrieve comprehensive dividend information for a given stock ticker.
 
-    Thie functions automates the scraping of the dividend history page from the
-    corresponding page on dividendhistory.org. Scraps the stock details, dividend
-    metrics table, and dividen history table. Handles pagination automatically.
+    Thie function automates the scraping of the dividend history page from the
+    corresponding page on dividendhistory.org. Scrapes the stock details, dividend
+    metrics table, and dividend history table. Handles pagination automatically.
 
     Args:
         ticker: The ticker symbol of to retrieve dividend information for.

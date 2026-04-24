@@ -69,9 +69,9 @@ class TestScraper:
         for i, div_event in enumerate(dividend_history.dividend_events):
             if div_event.pct_change is not None:
                 current_dividend = div_event.cash_amount
-                previous_divdend = dividend_history.dividend_events[i + 1].cash_amount
+                previous_dividend = dividend_history.dividend_events[i + 1].cash_amount
                 calculated_pct_change = (
-                    (current_dividend / previous_divdend - 1) * 100
+                    (current_dividend / previous_dividend - 1) * 100
                 ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
                 assert Decimal(str(div_event.pct_change)) == calculated_pct_change
@@ -97,7 +97,7 @@ class TestScraper:
     ):
         """Tests a downloaded version of the AAPL page on dividendhistory.org.
 
-        This test uses mocking to redirect to the local doanloaded version of the APPL
+        This test uses mocking to redirect to the local downloaded version of the APPL
         page.
         """
         from scraper.selenium_wrapper import SeleniumWrapper

@@ -8,7 +8,7 @@ from scraper.selenium_wrapper import SeleniumWrapper
 class TestSeleniumWrapper:
     @pytest.fixture(autouse=True)
     def _setup(self, selenium_wrapper: SeleniumWrapper, local_web_server: str):
-        """Opens up the local version of the AAPL dividen history page."""
+        """Opens up the local version of the AAPL dividend history page."""
         selenium_wrapper.open_page(url=local_web_server)
 
     def test_page_landing(self, selenium_wrapper: SeleniumWrapper):
