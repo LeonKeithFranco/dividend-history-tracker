@@ -79,7 +79,7 @@ def _extract_number(val: str) -> str | None:
         str: The extracted numeric value as a string, or None if no
             match is found.
     """
-    return _extract(val=val, pattern=r"-?\d+\.\d+")
+    return _extract(val=val, pattern=r"-?\d+(\.\d+)?")
 
 
 def _extract_date(val: str) -> str | None:
