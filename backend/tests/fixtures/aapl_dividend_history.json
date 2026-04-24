@@ -1,0 +1,558 @@
+{
+  "dividend_history": {
+    "dividend_events": [
+      {
+        "ex_dividend_date": "2026-08-11",
+        "payout_date": "2026-08-14",
+        "cash_amount": "0.27",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2026-05-12",
+        "payout_date": "2026-05-15",
+        "cash_amount": "0.27",
+        "pct_change": 4.1
+      },
+      {
+        "ex_dividend_date": "2026-02-09",
+        "payout_date": "2026-02-12",
+        "cash_amount": "0.26",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2025-11-10",
+        "payout_date": "2025-11-13",
+        "cash_amount": "0.26",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2025-08-11",
+        "payout_date": "2025-08-14",
+        "cash_amount": "0.26",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2025-05-12",
+        "payout_date": "2025-05-15",
+        "cash_amount": "0.26",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2025-02-10",
+        "payout_date": "2025-02-13",
+        "cash_amount": "0.25",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2024-11-11",
+        "payout_date": "2024-11-14",
+        "cash_amount": "0.25",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2024-08-12",
+        "payout_date": "2024-08-15",
+        "cash_amount": "0.25",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2024-05-10",
+        "payout_date": "2024-05-16",
+        "cash_amount": "0.25",
+        "pct_change": 4.17
+      },
+      {
+        "ex_dividend_date": "2024-02-09",
+        "payout_date": "2024-02-15",
+        "cash_amount": "0.24",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2023-11-10",
+        "payout_date": "2023-11-16",
+        "cash_amount": "0.24",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2023-08-11",
+        "payout_date": "2023-08-17",
+        "cash_amount": "0.24",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2023-05-12",
+        "payout_date": "2023-05-18",
+        "cash_amount": "0.24",
+        "pct_change": 4.35
+      },
+      {
+        "ex_dividend_date": "2023-02-10",
+        "payout_date": "2023-02-16",
+        "cash_amount": "0.23",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2022-11-04",
+        "payout_date": "2022-11-10",
+        "cash_amount": "0.23",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2022-08-05",
+        "payout_date": "2022-08-11",
+        "cash_amount": "0.23",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2022-05-06",
+        "payout_date": "2022-05-12",
+        "cash_amount": "0.23",
+        "pct_change": 4.55
+      },
+      {
+        "ex_dividend_date": "2022-02-04",
+        "payout_date": "2022-02-10",
+        "cash_amount": "0.22",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2021-11-05",
+        "payout_date": "2021-11-11",
+        "cash_amount": "0.22",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2021-08-06",
+        "payout_date": "2021-08-12",
+        "cash_amount": "0.22",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2021-05-07",
+        "payout_date": "2021-05-13",
+        "cash_amount": "0.22",
+        "pct_change": 7.32
+      },
+      {
+        "ex_dividend_date": "2021-02-05",
+        "payout_date": "2021-02-11",
+        "cash_amount": "0.205",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2020-11-06",
+        "payout_date": "2020-11-12",
+        "cash_amount": "0.205",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2020-08-07",
+        "payout_date": "2020-08-13",
+        "cash_amount": "0.205",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2020-05-08",
+        "payout_date": "2020-05-14",
+        "cash_amount": "0.205",
+        "pct_change": 6.49
+      },
+      {
+        "ex_dividend_date": "2020-02-07",
+        "payout_date": "2020-02-13",
+        "cash_amount": "0.1925",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2019-11-07",
+        "payout_date": "2019-11-14",
+        "cash_amount": "0.1925",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2019-08-09",
+        "payout_date": "2019-08-15",
+        "cash_amount": "0.1925",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2019-05-10",
+        "payout_date": "2019-05-16",
+        "cash_amount": "0.1925",
+        "pct_change": 5.48
+      },
+      {
+        "ex_dividend_date": "2019-02-08",
+        "payout_date": "2019-02-14",
+        "cash_amount": "0.1825",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2018-11-08",
+        "payout_date": "2018-11-15",
+        "cash_amount": "0.1825",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2018-08-10",
+        "payout_date": "2018-08-16",
+        "cash_amount": "0.1825",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2018-05-11",
+        "payout_date": "2018-05-17",
+        "cash_amount": "0.1825",
+        "pct_change": 15.87
+      },
+      {
+        "ex_dividend_date": "2018-02-09",
+        "payout_date": "2018-02-15",
+        "cash_amount": "0.1575",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2017-11-10",
+        "payout_date": "2017-11-16",
+        "cash_amount": "0.1575",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2017-08-10",
+        "payout_date": "2017-08-17",
+        "cash_amount": "0.1575",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2017-05-11",
+        "payout_date": "2017-05-18",
+        "cash_amount": "0.1575",
+        "pct_change": 10.53
+      },
+      {
+        "ex_dividend_date": "2017-02-09",
+        "payout_date": "2017-02-16",
+        "cash_amount": "0.1425",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2016-11-03",
+        "payout_date": "2016-11-10",
+        "cash_amount": "0.1425",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2016-08-04",
+        "payout_date": "2016-08-11",
+        "cash_amount": "0.1425",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2016-05-05",
+        "payout_date": "2016-05-12",
+        "cash_amount": "0.1425",
+        "pct_change": 9.62
+      },
+      {
+        "ex_dividend_date": "2016-02-04",
+        "payout_date": "2016-02-11",
+        "cash_amount": "0.13",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2015-11-05",
+        "payout_date": "2015-11-12",
+        "cash_amount": "0.13",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2015-08-06",
+        "payout_date": "2015-08-13",
+        "cash_amount": "0.13",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2015-05-07",
+        "payout_date": "2015-05-14",
+        "cash_amount": "0.13",
+        "pct_change": 10.64
+      },
+      {
+        "ex_dividend_date": "2015-02-05",
+        "payout_date": "2015-02-12",
+        "cash_amount": "0.1175",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2014-11-06",
+        "payout_date": "2014-11-13",
+        "cash_amount": "0.1175",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2014-08-07",
+        "payout_date": "2014-08-14",
+        "cash_amount": "0.1175",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2014-05-08",
+        "payout_date": "2014-05-15",
+        "cash_amount": "0.1175",
+        "pct_change": 7.87
+      },
+      {
+        "ex_dividend_date": "2014-02-06",
+        "payout_date": "2014-02-13",
+        "cash_amount": "0.108929",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2013-11-06",
+        "payout_date": "2013-11-14",
+        "cash_amount": "0.108929",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2013-08-08",
+        "payout_date": "2013-08-15",
+        "cash_amount": "0.108929",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2013-05-09",
+        "payout_date": "2013-05-16",
+        "cash_amount": "0.108929",
+        "pct_change": 15.09
+      },
+      {
+        "ex_dividend_date": "2013-02-07",
+        "payout_date": "2013-02-14",
+        "cash_amount": "0.094643",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2012-11-07",
+        "payout_date": "2012-11-15",
+        "cash_amount": "0.094643",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "2012-08-09",
+        "payout_date": "2012-08-16",
+        "cash_amount": "0.094643",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1995-11-21",
+        "payout_date": "1995-11-28",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1995-08-16",
+        "payout_date": "1995-08-23",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1995-05-26",
+        "payout_date": "1995-06-03",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1995-02-13",
+        "payout_date": "1995-02-20",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1994-11-18",
+        "payout_date": "1994-11-25",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1994-08-15",
+        "payout_date": "1994-08-22",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1994-05-27",
+        "payout_date": "1994-06-03",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1994-02-07",
+        "payout_date": "1994-02-14",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1993-11-19",
+        "payout_date": "1993-11-26",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1993-08-16",
+        "payout_date": "1993-08-23",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1993-05-28",
+        "payout_date": "1993-06-04",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1993-02-12",
+        "payout_date": "1993-02-19",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1992-11-30",
+        "payout_date": "1992-12-07",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1992-08-17",
+        "payout_date": "1992-08-24",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1992-06-01",
+        "payout_date": "1992-06-08",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1992-02-14",
+        "payout_date": "1992-02-21",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1991-11-18",
+        "payout_date": "1991-11-25",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1991-08-19",
+        "payout_date": "1991-08-26",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1991-05-20",
+        "payout_date": "1991-05-27",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1991-02-15",
+        "payout_date": "1991-02-22",
+        "cash_amount": "0.004286",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1990-11-16",
+        "payout_date": "1990-11-23",
+        "cash_amount": "0.004286",
+        "pct_change": 9.09
+      },
+      {
+        "ex_dividend_date": "1990-08-20",
+        "payout_date": "1990-08-27",
+        "cash_amount": "0.003929",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1990-05-21",
+        "payout_date": "1990-05-28",
+        "cash_amount": "0.003929",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1990-02-16",
+        "payout_date": "1990-02-23",
+        "cash_amount": "0.003929",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1989-11-17",
+        "payout_date": "1989-11-24",
+        "cash_amount": "0.003929",
+        "pct_change": 10.03
+      },
+      {
+        "ex_dividend_date": "1989-08-21",
+        "payout_date": "1989-08-28",
+        "cash_amount": "0.003571",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1989-05-22",
+        "payout_date": "1989-05-29",
+        "cash_amount": "0.003571",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1989-02-17",
+        "payout_date": "1989-02-24",
+        "cash_amount": "0.003571",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1988-11-21",
+        "payout_date": "1988-11-28",
+        "cash_amount": "0.003571",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1988-08-15",
+        "payout_date": "1988-08-22",
+        "cash_amount": "0.000714",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1988-05-16",
+        "payout_date": "1988-05-23",
+        "cash_amount": "0.000714",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1988-02-12",
+        "payout_date": "1988-02-19",
+        "cash_amount": "0.000714",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1987-11-17",
+        "payout_date": "1987-11-24",
+        "cash_amount": "0.000714",
+        "pct_change": 33.21
+      },
+      {
+        "ex_dividend_date": "1987-08-10",
+        "payout_date": "1987-08-17",
+        "cash_amount": "0.000536",
+        "pct_change": null
+      },
+      {
+        "ex_dividend_date": "1987-05-11",
+        "payout_date": "1987-05-18",
+        "cash_amount": "0.000536",
+        "pct_change": null
+      }
+    ]
+  }
+}
