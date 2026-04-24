@@ -31,3 +31,7 @@ extend-exclude = [
     "backend/tests/fixtures/",
     "uv.lock",
 ]
+
+# [tool.typos.default.extend-words]
+# crate = "crate" # supressing false positive
+# teh = "the" # force correction
