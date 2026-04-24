@@ -154,14 +154,18 @@ def _parse_cash_amount(val: str) -> Decimal:
 
 
 def _get_stock_info(dividend_history_page: DividendHistoryPage) -> StockInfo:
-    """Get stock information from HTML.
+    """Extract stock information from the dividend history page.
 
     Args:
-        stock_info_html: The HTML string containing stock information.
+        dividend_history_page: The DividendHistoryPage instance to extract stock
+            information from.
 
     Returns:
-        StockInfo: A StockInfo object with the extracted company name,
-            ticker symbol, and exchange.
+        StockInfo: A StockInfo object containing the company name, ticker symbol,
+            and exchange.
+
+    Raises:
+        TickerNotFoundError: If the stock information element is not found on the page.
     """
     try:
         stock_info_html = dividend_history_page.get_stock_info_html()
@@ -182,16 +186,17 @@ def _get_stock_info(dividend_history_page: DividendHistoryPage) -> StockInfo:
 def _get_dividend_metrics(
     dividend_history_page: DividendHistoryPage,
 ) -> DividendMetrics:
-    """Extract dividend metrics from a table HTML.
+    """Extract dividend metrics from the dividend history page.
 
     Args:
-        dividend_metrics_table_html: The HTML string containing the dividend
-            metrics table.
+        dividend_history_page: The DividendHistoryPage instance to extract metrics from.
 
     Returns:
-        DividendMetrics: A DividendMetrics object with the extracted yield,
-            payout ratio, frequency, annual dividend, and the next dividend
-            dates.
+        DividendMetrics: A DividendMetrics object containing yield, payout ratio,
+            frequency, annual dividend, and the next ex-dividend and payout dates.
+
+    Raises:
+        TickerHasNoDividends: If the dividend metrics table is not found on the page.
     """
     try:
         dividend_metrics_table_html = (
@@ -227,11 +232,18 @@ def _get_dividend_metrics(
 
 
 def _get_dividend_history(dividend_events_table_html: str) -> DividendHistory:
-    """Extract dividend history events from table HTML.
+    """Extract dividend history events from an HTML table.
+
+    Parses the dividend history table HTML and creates DividendEvent objects for
+    each row in the table.
 
     Args:
-        DividendHistory: A Dividend History object containing the extracted dividend
-            events.
+        dividend_events_table_html: The HTML string containing the dividend
+            events table.
+
+    Returns:
+        DividendHistory: A DividendHistory object containing the extracted
+            dividend events.
     """
     history = DividendHistory()
 
@@ -258,6 +270,23 @@ def _get_dividend_history(dividend_events_table_html: str) -> DividendHistory:
 def _get_complete_dividend_history(
     dividend_history_page: DividendHistoryPage,
 ) -> DividendHistory:
+    """Retrieve the complete dividend history by handling pagination.
+
+    Fetches the dividend history table and automatically navigates through all
+    pages of results by clicking the next button, accumulating all dividend
+    events into a single DividendHistory object.
+
+    Args:
+        dividend_history_page: The DividendHistoryPage instance to extract
+            dividend history from.
+
+    Returns:
+        DividendHistory: A DividendHistory object containing all dividend events
+            across all pages.
+
+    Raises:
+        TickerHasNoDividends: If the dividend history table is not found on the page.
+    """
     try:
         dividend_events_table_html = (
             dividend_history_page.get_dividend_events_table_html()
@@ -281,6 +310,22 @@ def _get_complete_dividend_history(
 
 
 def _open_page(driver: SeleniumWrapper, url: str) -> None:
+    """Navigate to a URL with automatic retry logic.
+
+    Attempts to open the specified URL with exponential backoff retry on failure.
+    Raises ScraperTimeoutError for timeout failures and ScraperUnavailableError
+    for driver-related failures.
+
+    Args:
+        driver: The SeleniumWrapper instance to use for navigation.
+        url: The URL to navigate to.
+
+    Raises:
+        ScraperTimeoutError: If the page fails to load within the timeout period
+            after all retry attempts.
+        ScraperUnavailableError: If the WebDriver encounters an error after all
+            retry attempts.
+    """
     for attempt in range(1, _MAX_RETRIES + 1):
         try:
             driver.open_page(url)
