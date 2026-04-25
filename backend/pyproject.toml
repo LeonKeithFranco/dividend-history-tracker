@@ -10,3 +10,8 @@ dependencies = [
     "selenium>=4.43.0",
     "sqlalchemy>=2.0.49",
 ]
+
+[dependency-groups]
+dev = [
+    "alembic>=1.18.4",
+]
