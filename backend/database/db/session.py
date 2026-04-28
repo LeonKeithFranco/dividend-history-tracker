@@ -1,10 +1,10 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-DATABASE_URL = "sqlite+aiosqlite:///div-history.db"
+from config import get_settings
 
 _engine = create_async_engine(
-    DATABASE_URL,
-    echo=True,
+    get_settings().db_url,
+    echo=get_settings().app_debug,
 )
 
 AsyncSessionFactory = async_sessionmaker(
