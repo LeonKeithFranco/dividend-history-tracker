@@ -15,8 +15,7 @@ class Stock(Base):
     __tablename__ = "stocks"
 
     company_name: Mapped[str] = mapped_column(
-        String(20),
-        unique=True,
+        String(100),
     )
     ticker_symbol: Mapped[str] = mapped_column(
         String(5),
