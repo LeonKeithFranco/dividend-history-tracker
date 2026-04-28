@@ -12,6 +12,22 @@ if TYPE_CHECKING:
 
 
 class Stock(Base):
+    """ORM model representing a tracked stock.
+
+    Serves as the root entity in the data model, with a one-to-one relationship to its
+    current dividend metrics and one-to-many relationship to its full dividend history.
+
+    Attributes:
+        id: Auto-incremented primary key inherited from Base.
+        company_name: The full legal name of the company.
+        ticker_symbol: The stock's exchange ticker symbol. Unique across all stocks.
+        exchange: The exchange the stock is listed on (e.g. NYSE, NASDAQ).
+        date_refreshed: The UTC timestamp of the last data refresh. Defaults to the time
+            the row was inserted.
+        metric: The associated DividendMetric record for this stock.
+        events: The list of DividendEvent records belonging to this stock.
+    """
+
     __tablename__ = "stocks"
 
     company_name: Mapped[str] = mapped_column(

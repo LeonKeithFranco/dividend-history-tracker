@@ -12,6 +12,24 @@ if TYPE_CHECKING:
 
 
 class DividendEvent(Base):
+    """ORM model representing a single historical dividend event for a stock.
+
+    Each record captures the details of one dividend payout. The combination of stock and
+    ex-dividend date is unique, precenting duplicate events from being inserted on
+    subsequent refreshes.
+
+    Attributes:
+        id: Auto-incremented primary key inherited from Base.
+        ex_dividend_date: The date on which the stock began trading without the right to
+            thedividend.
+        payout_date: The date on which the dividiend was paid to shareholders.
+        cash_amount: The per-share cash dividend amount.
+        pct_change: The percentage change in dividend amount relative to the prior event.
+            None if the first recorded event or the change is not available.
+        stock_id: Forieng key referencing the parent Stock record.
+        stock: The parent stock instance this event belongs to.
+    """
+
     __tablename__ = "events"
 
     ex_dividend_date: Mapped[date]
