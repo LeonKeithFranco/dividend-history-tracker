@@ -22,7 +22,7 @@ class Stock(Base):
         String(5),
         unique=True,
     )
-    ticker_symbol: Mapped[str] = mapped_column(
+    exchange: Mapped[str] = mapped_column(
         String(10),
     )
     date_refreshed: Mapped[date] = mapped_column(
