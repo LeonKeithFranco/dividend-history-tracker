@@ -27,7 +27,7 @@ class DividendMetric(Base):
 
     stock_id: Mapped[int] = mapped_column(
         ForeignKey("stocks.id", ondelete="CASCADE"),
-        index=True,
+        unique=True,
     )
 
     stock: Mapped["Stock"] = relationship(
