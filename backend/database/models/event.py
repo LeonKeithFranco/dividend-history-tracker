@@ -2,7 +2,7 @@ from datetime import date
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Numeric
+from sqlalchemy import ForeignKey, Numeric, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database.db import Base
@@ -28,4 +28,8 @@ class DividendEvent(Base):
 
     stock: Mapped["Stock"] = relationship(
         back_populates="events",
+    )
+
+    __tableargs__ = (
+        UniqueConstraint("stock_id", "ex_dividend_date", name="uq_event_stock_date"),
     )
