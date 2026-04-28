@@ -30,6 +30,6 @@ class DividendEvent(Base):
         back_populates="events",
     )
 
-    __tableargs__ = (
+    __table_args__ = (
         UniqueConstraint("stock_id", "ex_dividend_date", name="uq_event_stock_date"),
     )

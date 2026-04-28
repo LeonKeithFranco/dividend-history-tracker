@@ -1,5 +1,5 @@
 from database.db.base import Base
-from database.db.session import DATABASE_URL, AsyncSessionFactory
+from database.db.session import AsyncSessionFactory
 
 __all__ = [
     "Base",
