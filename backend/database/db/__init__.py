@@ -4,5 +4,4 @@ from database.db.session import AsyncSessionFactory
 __all__ = [
     "Base",
     "AsyncSessionFactory",
-    "DATABASE_URL",
 ]
