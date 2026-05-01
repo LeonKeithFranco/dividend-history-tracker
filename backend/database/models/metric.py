@@ -20,15 +20,15 @@ class DividendMetric(Base):
     Attributes:
         id: Auto-incremented primary key inherited from Base.
         yield_: The dividend yield as a percentage.
-        payout_ratio: The proportion of earnings paid out as a divdends, expressed as a
+        payout_ratio: The proportion of earnings paid out as a dividends, expressed as a
             percentage.
-        frequency: The dividend payment frequency (e.g. "Monthly", "Quareterly").
+        frequency: The dividend payment frequency (e.g. "Monthly", "Quarterly").
         annual_dividend: The total annual dividend per share.
         next_ex_dividend_date: The next date on which a buyer must own the stock to be
             entitled to the upcoming dividend.
         next_payout_date: The date on which the next dividend payment will be made.
         stock_id: Foreign key referencing the parent stock record.
-        stocl: The parent Stock instance this metric belongs to.
+        stock: The parent Stock instance this metric belongs to.
     """
 
     __tablename__ = "metrics"
