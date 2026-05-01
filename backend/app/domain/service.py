@@ -1,7 +1,36 @@
+from datetime import UTC, datetime, timedelta
+from typing import cast
+
+from attr import asdict
+from fastapi import BackgroundTasks
+
 from app.domain.repository import StockRepoDependency, StockRepository
 from app.domain.schemas import StockDividendHistoryResponse
-from database.models import Stock
+from database.db import AsyncSessionFactory
+from database.models import DividendEvent, Stock
 from scraper import async_get_dividend_info
+from scraper.scraper import async_get_just_dividend_history
+
+
+async def _do_refresh(ticker: str, stock_repo: StockRepository):
+    new_dividend_history = await async_get_just_dividend_history(ticker)
+
+    stock = cast(Stock, await stock_repo.get_stock(ticker))
+
+    new_dividend_events = [
+        event
+        for event in new_dividend_history.dividend_events
+        if event.ex_dividend_date > stock.events[~0].ex_dividend_date
+    ]
+
+    await stock_repo.insert_new_dividend_events(stock, new_dividend_events)
+    await stock_repo.commit()
+
+
+async def _update_dividend_history(ticker: str) -> None:
+    async with AsyncSessionFactory() as db:
+        stock_repo = StockRepository(db)
+        await _do_refresh(ticker, stock_repo)
 
 
 class DividendHistoryService:
@@ -15,14 +44,30 @@ class DividendHistoryService:
 
         return stock
 
-    async def get_dividend_history(self, ticker: str) -> StockDividendHistoryResponse:
+    async def get_dividend_history(
+        self, ticker: str, background_tasks: BackgroundTasks
+    ) -> StockDividendHistoryResponse:
         stock = await self.stock_repo.get_stock(ticker)
 
         if stock is None:
             new_stock = await self._insert_new_stock(ticker)
-
             await self.stock_repo.commit()
 
             return StockDividendHistoryResponse.model_validate(new_stock)
 
-        # TODO: flesh out rest of logic
+        if datetime.now(UTC) - stock.date_refreshed < timedelta(days=7):
+            return StockDividendHistoryResponse.model_validate(stock)
+
+        if (
+            timedelta(days=7)
+            <= datetime.now(UTC) - stock.date_refreshed
+            < timedelta(days=30)
+        ):
+            background_tasks.add_task(background_tasks, ticker)
+
+            return StockDividendHistoryResponse.model_validate(stock)
+
+        if datetime.now(UTC) - stock.date_refreshed >= timedelta(days=30):
+            await _do_refresh(ticker, self.stock_repo)
+
+        return StockDividendHistoryResponse.model_validate(stock)

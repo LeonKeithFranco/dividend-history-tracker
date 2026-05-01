@@ -387,3 +387,28 @@ async def async_get_dividend_info(
     ticker: str,
 ) -> tuple[StockInfo, DividendMetrics, DividendHistory]:
     return await asyncio.to_thread(get_dividend_info, ticker)
+
+
+def get_just_dividend_history(ticker: str) -> DividendHistory:
+    DIVIDEND_HISTORY_URL = f"https://dividendhistory.org/payout/{ticker.upper()}/"
+
+    with SeleniumWrapper() as driver:
+        _open_page(driver, DIVIDEND_HISTORY_URL)
+
+        dividend_history_page = DividendHistoryPage(driver)
+
+        for attempt in range(1, _MAX_RETRIES + 1):
+            try:
+                dividend_history = _get_complete_dividend_history(dividend_history_page)
+                break
+            except StaleElementReferenceException as e:
+                if attempt < _MAX_RETRIES:
+                    continue
+
+                raise ParseError("could not parse element on page") from e
+
+    return dividend_history
+
+
+async def async_get_just_dividend_history(ticker: str) -> DividendHistory:
+    return await asyncio.to_thread(get_just_dividend_history, ticker)
