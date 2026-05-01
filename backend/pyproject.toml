@@ -15,4 +15,5 @@ dependencies = [
 [dependency-groups]
 dev = [
     "alembic>=1.18.4",
+    "httpx>=0.28.1",
 ]

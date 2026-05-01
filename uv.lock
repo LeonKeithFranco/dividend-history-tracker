@@ -115,6 +115,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "alembic" },
+    { name = "httpx" },
 ]
 
 [package.metadata]
@@ -128,7 +129,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "alembic", specifier = ">=1.18.4" }]
+dev = [
+    { name = "alembic", specifier = ">=1.18.4" },
+    { name = "httpx", specifier = ">=0.28.1" },
+]
 
 [[package]]
 name = "beautifulsoup4"
