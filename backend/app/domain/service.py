@@ -23,3 +23,5 @@ class DividendHistoryService:
             await self.stock_repo.db.commit()
 
             return StockDividendHistoryReponse.model_validate(new_stock)
+
+        # TODO: flesh out rest of logic
