@@ -17,7 +17,7 @@ async def _do_refresh(ticker: str, stock_repo: StockRepository):
     stock = cast(Stock, await stock_repo.get_stock(ticker))
 
     latest_ex_dividend_date = (
-        stock.events[~0].ex_dividend_date if stock.events else datetime.min
+        stock.events[-1].ex_dividend_date if stock.events else datetime.min
     )
 
     new_dividend_events = [

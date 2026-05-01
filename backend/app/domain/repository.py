@@ -4,11 +4,11 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import contains_eager, selectinload
 
 from database.db.session import get_db
 from database.models import DividendEvent, DividendMetric, Stock
-from scraper import DividendEvent as ScalperDividendEvent
+from scraper import DividendEvent as ScraperDividendEvent
 from scraper import DividendHistory, DividendMetrics, StockInfo
 
 DbDependency = Annotated[AsyncSession, Depends(get_db)]
@@ -26,7 +26,10 @@ class StockRepository:
             select(Stock)
             .outerjoin(Stock.events)
             .where(Stock.ticker_symbol == ticker)
-            .options(contains_eager(Stock.events))
+            .options(
+                contains_eager(Stock.events),
+                selectinload(Stock.metric),
+            )
             .order_by(DividendEvent.ex_dividend_date.asc())
         )
         results = await self.db.execute(query)
@@ -51,7 +54,7 @@ class StockRepository:
         return stock
 
     async def insert_new_dividend_events(
-        self, stock: Stock, events: list[ScalperDividendEvent]
+        self, stock: Stock, events: list[ScraperDividendEvent]
     ) -> None:
         stock.events.extend([DividendEvent(**asdict(event)) for event in events])
 
