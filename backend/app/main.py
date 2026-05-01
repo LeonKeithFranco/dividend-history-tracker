@@ -11,10 +11,10 @@ async def root():
     return {"message": "Hello world"}
 
 
-@app.get("/dividends/{stock}", response_model=StockDividendHistoryResponse)
+@app.get("/dividends/{ticker}", response_model=StockDividendHistoryResponse)
 async def get_dividend_history(
-    stock: str,
+    ticker: str,
     service: DividendHistoryServiceDependency,
-    backgrounds_tasks: BackgroundTasks,
+    background_tasks: BackgroundTasks,
 ):
-    return await service.get_dividend_history(stock, backgrounds_tasks)
+    return await service.get_dividend_history(ticker, background_tasks)
