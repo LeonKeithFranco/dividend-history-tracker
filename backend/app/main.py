@@ -56,7 +56,7 @@ async def scraper_unavailable_handler(
 async def parse_handler(request: Request, exc: ParseError) -> JSONResponse:
     return JSONResponse(
         status_code=status.HTTP_502_BAD_GATEWAY,
-        content={"detail": "Recieved an unparseable response from the data source."},
+        content={"detail": "Received an unparseable response from the data source."},
     )
 
 
