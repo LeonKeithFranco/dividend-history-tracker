@@ -24,7 +24,7 @@ class StockRepository:
     async def get_stock(self, ticker: str) -> Stock | None:
         query = (
             select(Stock)
-            .join(Stock.events)
+            .outerjoin(Stock.events)
             .where(Stock.ticker_symbol == ticker)
             .options(contains_eager(Stock.events))
             .order_by(DividendEvent.ex_dividend_date.asc())

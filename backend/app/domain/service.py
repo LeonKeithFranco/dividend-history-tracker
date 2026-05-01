@@ -1,13 +1,12 @@
 from datetime import UTC, datetime, timedelta
 from typing import cast
 
-from attr import asdict
 from fastapi import BackgroundTasks
 
 from app.domain.repository import StockRepoDependency, StockRepository
 from app.domain.schemas import StockDividendHistoryResponse
 from database.db import AsyncSessionFactory
-from database.models import DividendEvent, Stock
+from database.models import Stock
 from scraper import async_get_dividend_info
 from scraper.scraper import async_get_just_dividend_history
 
@@ -17,20 +16,25 @@ async def _do_refresh(ticker: str, stock_repo: StockRepository):
 
     stock = cast(Stock, await stock_repo.get_stock(ticker))
 
+    latest_ex_dividend_date = (
+        stock.events[~0].ex_dividend_date if stock.events else datetime.min
+    )
+
     new_dividend_events = [
         event
         for event in new_dividend_history.dividend_events
-        if event.ex_dividend_date > stock.events[~0].ex_dividend_date
+        if event.ex_dividend_date > latest_ex_dividend_date
     ]
 
+    stock.date_refreshed = datetime.now(UTC)
     await stock_repo.insert_new_dividend_events(stock, new_dividend_events)
-    await stock_repo.commit()
 
 
 async def _update_dividend_history(ticker: str) -> None:
     async with AsyncSessionFactory() as db:
         stock_repo = StockRepository(db)
         await _do_refresh(ticker, stock_repo)
+        await stock_repo.commit()
 
 
 class DividendHistoryService:
@@ -63,11 +67,12 @@ class DividendHistoryService:
             <= datetime.now(UTC) - stock.date_refreshed
             < timedelta(days=30)
         ):
-            background_tasks.add_task(background_tasks, ticker)
+            background_tasks.add_task(_update_dividend_history, ticker)
 
             return StockDividendHistoryResponse.model_validate(stock)
 
         if datetime.now(UTC) - stock.date_refreshed >= timedelta(days=30):
             await _do_refresh(ticker, self.stock_repo)
+            await self.stock_repo.commit()
 
         return StockDividendHistoryResponse.model_validate(stock)
