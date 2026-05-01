@@ -1,3 +1,4 @@
+import asyncio
 import re
 import time
 from dataclasses import dataclass, field
@@ -37,7 +38,7 @@ class DividendMetrics:
     """Metrics related to a stocks dividend history."""
 
     yield_: float
-    pay_out_ratio: float
+    payout_ratio: float
     frequency: str
     annual_dividend: Decimal
     next_ex_dividend_date: date
@@ -217,7 +218,7 @@ def _get_dividend_metrics(
 
     return DividendMetrics(
         yield_=_parse_pct(metrics_text[0]),
-        pay_out_ratio=_parse_pct(metrics_text[2]),
+        payout_ratio=_parse_pct(metrics_text[2]),
         frequency=metrics_text[3],
         annual_dividend=_parse_cash_amount(metrics_text[4]),
         next_ex_dividend_date=datetime.strptime(
@@ -380,3 +381,9 @@ def get_dividend_info(
                 raise ParseError("could not parse element on page") from e
 
     return (stock_info, dividend_metrics, dividend_history)
+
+
+async def async_get_dividend_info(
+    ticker: str,
+) -> tuple[StockInfo, DividendMetrics, DividendHistory]:
+    return await asyncio.to_thread(get_dividend_info, ticker)

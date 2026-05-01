@@ -16,6 +16,9 @@ class StockRepository:
     def __init__(self, db: DbDependency) -> None:
         self.db: AsyncSession = db
 
+    async def commit(self) -> None:
+        await self.db.commit()
+
     async def get_stock(self, ticker: str) -> Stock | None:
         query = select(Stock).where(Stock.ticker_symbol == ticker)
         results = await self.db.execute(query)

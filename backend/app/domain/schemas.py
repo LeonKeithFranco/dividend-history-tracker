@@ -15,7 +15,7 @@ class DividendEventSchema(BaseModel):
     pct_change: float | None
 
 
-class StockDividendHistoryReponse(BaseModel):
+class StockDividendHistoryResponse(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
     )
@@ -24,4 +24,4 @@ class StockDividendHistoryReponse(BaseModel):
     ticker_symbol: str
     exchange: str
     date_refreshed: datetime
-    dividend_events: list[DividendEventSchema]
+    events: list[DividendEventSchema]

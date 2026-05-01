@@ -3,6 +3,7 @@ from scraper.scraper import (
     DividendHistory,
     DividendMetrics,
     StockInfo,
+    async_get_dividend_info,
     get_dividend_info,
 )
 
@@ -12,4 +13,5 @@ __all__ = [
     "DividendMetrics",
     "DividendEvent",
     "DividendHistory",
+    "async_get_dividend_info",
 ]
