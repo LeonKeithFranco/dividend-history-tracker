@@ -1,7 +1,7 @@
 from datetime import UTC, datetime, timedelta
-from typing import cast
+from typing import Annotated, cast
 
-from fastapi import BackgroundTasks
+from fastapi import BackgroundTasks, Depends
 
 from app.domain.repository import StockRepoDependency, StockRepository
 from app.domain.schemas import StockDividendHistoryResponse
@@ -76,3 +76,8 @@ class DividendHistoryService:
             await self.stock_repo.commit()
 
         return StockDividendHistoryResponse.model_validate(stock)
+
+
+DividendHistoryServiceDependency = Annotated[
+    DividendHistoryService, Depends(DividendHistoryService)
+]
