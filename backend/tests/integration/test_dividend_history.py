@@ -84,7 +84,7 @@ class TestGetDividendHistory:
         mocker.patch.object(
             service,
             "async_get_dividend_info",
-            side_effects=ScraperTimeoutError("Timed out loading page."),
+            side_effect=ScraperTimeoutError("Timed out loading page."),
         )
 
         response = client.get("/dividends/AAPL")
@@ -98,7 +98,7 @@ class TestGetDividendHistory:
         mocker.patch.object(
             service,
             "async_get_dividend_info",
-            side_effects=ScraperUnavailableError("Driver crashed"),
+            side_effect=ScraperUnavailableError("Driver crashed"),
         )
 
         response = client.get("/dividends/AAPL")
