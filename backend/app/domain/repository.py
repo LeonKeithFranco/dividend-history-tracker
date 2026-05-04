@@ -49,7 +49,9 @@ class StockRepository:
 
         self.db.add(stock)
         await self.db.flush()
-        await self.db.refresh(stock)
+
+        # Refresh with eager loading to avoid MissingGreenlet error during Pydantic validation
+        await self.db.refresh(stock, attribute_names=["metric", "events"])
 
         return stock
 
@@ -59,7 +61,7 @@ class StockRepository:
         stock.events.extend([DividendEvent(**asdict(event)) for event in events])
 
         await self.db.flush()
-        await self.db.refresh(stock)
+        await self.db.refresh(stock, attribute_names=["metric", "events"])
 
 
 StockRepoDependency = Annotated[StockRepository, Depends(StockRepository)]
