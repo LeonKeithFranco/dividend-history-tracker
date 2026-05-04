@@ -1,4 +1,3 @@
-import os
 from http import HTTPStatus
 
 import httpx
@@ -50,7 +49,7 @@ match response.status_code:
             st.info("No dividend events found for this ticker.")
             st.stop()
 
-        st.write(f"**{len(events)}** divdend events on record.")
+        st.write(f"**{len(events)}** dividend events on record.")
 
         st.dataframe(
             events,
@@ -79,7 +78,7 @@ match response.status_code:
         st.error("The data source is currently unavailable. Try again later.")
 
     case HTTPStatus.BAD_GATEWAY:
-        st.error("Recieved bad data from the source. This may be a temporary issue.")
+        st.error("Received bad data from the source. This may be a temporary issue.")
 
     case _:
         st.error(f"Unexpected error (HTTP {response.status_code}).")
