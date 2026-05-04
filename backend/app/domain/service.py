@@ -59,19 +59,21 @@ class DividendHistoryService:
 
             return StockDividendHistoryResponse.model_validate(new_stock)
 
-        if datetime.now(UTC) - stock.date_refreshed < timedelta(days=7):
+        stock_date_refresh = stock.date_refreshed.replace(tzinfo=UTC)
+
+        if datetime.now(UTC) - stock_date_refresh < timedelta(days=7):
             return StockDividendHistoryResponse.model_validate(stock)
 
         if (
             timedelta(days=7)
-            <= datetime.now(UTC) - stock.date_refreshed
+            <= datetime.now(UTC) - stock_date_refresh
             < timedelta(days=30)
         ):
             background_tasks.add_task(_update_dividend_history, ticker)
 
             return StockDividendHistoryResponse.model_validate(stock)
 
-        if datetime.now(UTC) - stock.date_refreshed >= timedelta(days=30):
+        if datetime.now(UTC) - stock_date_refresh >= timedelta(days=30):
             await _do_refresh(ticker, self.stock_repo)
             await self.stock_repo.commit()
 

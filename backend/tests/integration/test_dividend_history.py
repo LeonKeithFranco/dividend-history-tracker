@@ -50,11 +50,11 @@ class TestGetDividendHistory:
     ) -> None:
         ticker = "AAPL"
 
-        first_response = client.get(f"/dividend/{ticker}")
+        first_response = client.get(f"/dividends/{ticker}")
         assert first_response.status_code == status.HTTP_200_OK
         mock_async_get_dividend_info.assert_called_once_with(ticker)
 
-        second_response = client.get(f"/dividend/{ticker}")
+        second_response = client.get(f"/dividends/{ticker}")
         assert second_response.status_code == status.HTTP_200_OK
         mock_async_get_dividend_info.assert_called_once()
 

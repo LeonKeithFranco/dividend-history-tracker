@@ -30,10 +30,10 @@ class StockRepository:
                 contains_eager(Stock.events),
                 selectinload(Stock.metric),
             )
-            .order_by(DividendEvent.ex_dividend_date.asc())
+            # .order_by(DividendEvent.ex_dividend_date.asc())
         )
         results = await self.db.execute(query)
-        return results.scalar_one_or_none()
+        return results.unique().scalar_one_or_none()
 
     async def insert_new_stock(
         self,
