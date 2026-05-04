@@ -5,5 +5,6 @@ description = "Frontend of the Dividend History Tracker"
 requires-python = ">=3.12"
 dependencies = [
     "httpx>=0.28.1",
+    "pydantic-settings>=2.14.0",
     "streamlit>=1.56.0",
 ]
