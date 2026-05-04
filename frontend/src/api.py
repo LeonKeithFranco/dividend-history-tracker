@@ -26,8 +26,8 @@ class BackendAPI:
     ) -> None:
         self.client.close()
 
-    def get_dividend_history(self, ticker: str) -> dict:
+    def get_dividend_history(self, ticker: str) -> httpx.Response:
         response = self.client.get(f"/dividends/{ticker}")
         response.raise_for_status()
 
-        return response.json()
+        return response
