@@ -13,6 +13,8 @@ class _Settings(BaseSettings):
     )
 
     api_base_url: str = "http://localhost:8000"
+    api_timeout: float = 60.0
+    app_title: str = "Dividend History Tracker"
 
 
 @lru_cache
