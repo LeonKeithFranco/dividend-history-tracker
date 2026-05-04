@@ -39,7 +39,9 @@ def local_web_server() -> Iterator[str]:
         str: The url of the local web server hosting the AAPL dividend history
              page.
     """
-    webpage_folder = Path(__file__).parent / "fixtures" / "dividendhistory_aapl_page"
+    webpage_folder = (
+        Path(__file__).parent.parent / "fixtures" / "dividendhistory_aapl_page"
+    )
 
     server = subprocess.Popen(
         args=["uv", "run", "python", "-m", "http.server", "9000"],

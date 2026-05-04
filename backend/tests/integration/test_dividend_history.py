@@ -75,7 +75,7 @@ class TestGetDividendHistory:
             side_effect=TickerNotFoundError(f"Ticker '{invalid_ticker}' not found"),
         )
 
-        response = client.get(f"dividends/{invalid_ticker}")
+        response = client.get(f"/dividends/{invalid_ticker}")
         assert "detail" in response.json()
 
     def test_scraper_timeout_returns_504(
