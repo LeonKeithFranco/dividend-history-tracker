@@ -5,7 +5,13 @@ from fastapi import status
 from fastapi.testclient import TestClient
 from pytest_mock import MockerFixture
 
+from app.domain import service
 from scraper import DividendHistory, DividendMetrics, StockInfo
+from scraper.errors import (
+    ScraperTimeoutError,
+    ScraperUnavailableError,
+    TickerNotFoundError,
+)
 
 
 @pytest.fixture
@@ -13,8 +19,6 @@ def mock_async_get_dividend_info(
     mocker: MockerFixture,
     mock_scraper_response: tuple[StockInfo, DividendMetrics, DividendHistory],
 ) -> MagicMock:
-    from app.domain import service
-
     return mocker.patch.object(
         service,
         "async_get_dividend_info",
@@ -59,3 +63,45 @@ class TestGetDividendHistory:
         mock_async_get_dividend_info.assert_called_once()
 
         assert first_response.json()["events"] == second_response.json()["events"]
+
+    def test_invalid_ticker_returns_404(
+        self, client: TestClient, mocker: MockerFixture
+    ) -> None:
+        invalid_ticker = "INVLD"
+
+        mocker.patch.object(
+            service,
+            "async_get_dividend_info",
+            side_effect=TickerNotFoundError(f"Ticker '{invalid_ticker}' not found"),
+        )
+
+        response = client.get(f"dividends/{invalid_ticker}")
+        assert "detail" in response.json()
+
+    def test_scraper_timeout_returns_504(
+        self, client: TestClient, mocker: MockerFixture
+    ) -> None:
+        mocker.patch.object(
+            service,
+            "async_get_dividend_info",
+            side_effects=ScraperTimeoutError("Timed out loading page."),
+        )
+
+        response = client.get("/dividends/AAPL")
+
+        assert response.status_code == status.HTTP_504_GATEWAY_TIMEOUT
+        assert "detail" in response.json()
+
+    def test_scraper_unavailable_returns_503(
+        self, client: TestClient, mocker: MockerFixture
+    ) -> None:
+        mocker.patch.object(
+            service,
+            "async_get_dividend_info",
+            side_effects=ScraperUnavailableError("Driver crashed"),
+        )
+
+        response = client.get("/dividends/AAPL")
+
+        assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE
+        assert "detail" in response.json()
