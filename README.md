@@ -1,6 +1,6 @@
 # Dividend history API
 
-A FastAPI service that scrapes, caches, and serves divdiend histories for US stocks, with a Streamlit look up client.
+A FastAPI service that scrapes, caches, and serves dividend histories for US stocks, with a Streamlit lookup client.
 
 ## What problem this solves
 
@@ -19,7 +19,7 @@ The project is split into two services that communicate over HTTP:
 
 **Data flow:**
 1. User enters ticker
-2. Streamlit calls `GET /dividends{ticker}`
+2. Streamlit calls `GET /dividends/{ticker}`
 3. API checks SQLite cache
 4. if fresh, return cached; if stale, return cached + background refresh; if expired or missing, block on scrape, cache, then return results
 
@@ -34,7 +34,7 @@ Prerequisites: Python 3.12+, uv, Chrome
 5. Start frontend: `cd frontend && uv run streamlit run main.py`
 6. Open http://localhost:8501 and enter a ticker symbol
 
-The first request for any ticker will take a few seconds. Seubsequent requests return cached data immediately.
+The first request for any ticker will take a few seconds. Subsequent requests return cached data immediately.
 
 ## API
 
@@ -45,7 +45,7 @@ Returns the full dividend history for a US stock.
 **Response (200):** `company_name`, `ticker_symbol`, `exchange`, `date_refreshed`, and `events`
 - `events` are a list of `{ ex_dividend_date, payout_date, cash_amount, pct_change }`
 
-**Cache behaviour*:*
+**Cache behaviour:**
 - Fresh (<7 days): returns cached data immediately
 - Stale (7-30 days): returns cached data, then triggers background refresh
 - Expired (> 30 days) or missing: blocks on live scrape, then returns results
@@ -54,28 +54,29 @@ Returns the full dividend history for a US stock.
 - 404: ticker not found or has no dividend history
 - 502: data source returned an unparseable response
 - 503: data source unavailable
-- 504: data srouce timed out
+- 504: data source timed out
 
-FastAPI also generates interactive docs at `https://localhost:8000/docs`
+FastAPI also generates interactive docs at `http://localhost:8000/docs`
 
 ## Testing
 
 The test suite is split by scope:
 
-**Unit tests** (`backend/tests/unit/scarper/`): Scraper reliability tests. The scarper's fetch and parse layers are separated so parsing can be tested against a saved HTML fixture (a downloaded copy of the AAPL page served by a local `http.server`) without the network. Failure-mode tests mock Selenium to simulate timeouts, driver crashes, and stale DOM elements, then verify the correct domain exception surfaces with the correct retry behaviour. A live-marked test (`pytest -m live`) scrapes the real Coca-Cola page as a smoke test.
+**Unit tests** (`backend/tests/unit/scraper/`): Scraper reliability tests. The scraper's fetch and parse layers are separated so parsing can be tested against a saved HTML fixture (a downloaded copy of the AAPL page served by a local `http.server`) without the network. Failure-mode tests mock Selenium to simulate timeouts, driver crashes, and stale DOM elements, then verify the correct domain exception surfaces with the correct retry behaviour. A live-marked test (`pytest -m live`) scrapes the real Coca-Cola page as a smoke test.
 
-**Integration tests** (`backend/tests/integration/`): API endpoint tests via FastAPI's `TestClient`. An in-memory SQLite database is created per test. the scraper is mocked at the service boundary so no browser starts. Tests verify cache-miss, cache-hit, and exception throwing.
+**Integration tests** (`backend/tests/integration/`): API endpoint tests via FastAPI's `TestClient`. An in-memory SQLite database is created per test. The scraper is mocked at the service boundary so no browser starts. Tests verify cache-miss, cache-hit, and exception throwing.
 
 ### Running tests:
 - Run all tests: `uv run pytest`
-- Run only unit tests: `uv run pytest backend/test/unit/`
+- Run only unit tests: `uv run pytest backend/tests/unit/`
 - Run only integration tests: `uv run pytest backend/tests/integration/`
 - Run live smoke test: `uv run pytest -m live`
-- Run all tests without live smoke test: `uv run pytest -n "not live"`
+- Run all tests without live smoke test: `uv run pytest -m "not live"`
 
 ## Reliability
 
 Scraping web pages is inherently unreliable. The scraper translates Selenium's generic exceptions into domain-specific errors based on which operation failed:
+
 | Operation | Selenium raises | Scraper raises | Retry? |
 |---|---|---|---|
 | Page load | `TimeoutException` | `ScraperTimeoutError` | Yes (3×, exponential backoff) |
@@ -86,7 +87,7 @@ Scraping web pages is inherently unreliable. The scraper translates Selenium's g
 
 Retries use exponential backoff. Non-retryable errors fail immediately.
 
-The API layer transalates these domain exceptions into HTTP status codes via FastAPI exception handlers, so no Selenium-specific details leak through the API boundary. An unhandled exception catch-all returns 500.
+The API layer translates these domain exceptions into HTTP status codes via FastAPI exception handlers, so no Selenium-specific details leak through the API boundary. An unhandled exception catch-all returns 500.
 
 ## Design decisions
 
