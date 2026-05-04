@@ -19,6 +19,7 @@ class TestSeleniumWrapper:
         selenium_wrapper.open_page(url=local_web_server)
 
     def test_page_landing(self, selenium_wrapper: SeleniumWrapper):
+        """Verify the page loaded by confirming the navbar brand text."""
         element = selenium_wrapper.driver.find_element(
             By.XPATH, "//a[@class='navbar-brand']"
         )
@@ -26,16 +27,19 @@ class TestSeleniumWrapper:
         assert element.text == "Dividend History"
 
     def test_get_html_page(self, selenium_wrapper: SeleniumWrapper):
+        """Verify get_html_page returns a complete HTML document."""
         html = selenium_wrapper.get_html_page()
 
         assert "<html" in html and "</html>" in html
 
     def test_get_html(self, selenium_wrapper: SeleniumWrapper):
+        """Verify get_html returns the outer HTML of a matched element."""
         elem_html = selenium_wrapper.get_html(By.XPATH, "//a[@class='navbar-brand']")
 
         assert "<a" in elem_html and "</a>" in elem_html
 
     def test_find_element_non_existent_element(self, selenium_wrapper: SeleniumWrapper):
+        """Verify find_element_with_wait raises TimeoutException for a missing element."""
         with pytest.raises(TimeoutException):
             selenium_wrapper.find_element_with_wait(
                 By.XPATH, "//a[@class='navbar']", timeout=1

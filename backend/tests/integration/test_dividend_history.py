@@ -48,6 +48,7 @@ class TestGetDividendHistory:
         client: TestClient,
         mock_async_get_dividend_info: MagicMock,
     ) -> None:
+        """Verify a first-time ticker lookup triggers a scrape and returns 200."""
         ticker = "AAPL"
 
         response = client.get(f"/dividends/{ticker}")
@@ -68,6 +69,7 @@ class TestGetDividendHistory:
         client: TestClient,
         mock_async_get_dividend_info: MagicMock,
     ) -> None:
+        """Verify a second request for a fresh ticker returns cached data without re-scraping."""
         ticker = "AAPL"
 
         first_response = client.get(f"/dividends/{ticker}")
@@ -83,6 +85,7 @@ class TestGetDividendHistory:
     def test_invalid_ticker_returns_404(
         self, client: TestClient, mocker: MockerFixture
     ) -> None:
+        """Verify TickerNotFoundError from the scraper maps to a 404 response."""
         invalid_ticker = "INVLD"
 
         mocker.patch.object(
@@ -97,6 +100,7 @@ class TestGetDividendHistory:
     def test_scraper_timeout_returns_504(
         self, client: TestClient, mocker: MockerFixture
     ) -> None:
+        """Verify ScraperTimeoutError from the scraper maps to a 504 response."""
         mocker.patch.object(
             service,
             "async_get_dividend_info",
@@ -111,6 +115,7 @@ class TestGetDividendHistory:
     def test_scraper_unavailable_returns_503(
         self, client: TestClient, mocker: MockerFixture
     ) -> None:
+        """Verify ScraperUnavailableError from the scraper maps to a 503 response."""
         mocker.patch.object(
             service,
             "async_get_dividend_info",

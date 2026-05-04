@@ -55,6 +55,13 @@ def _aapl_dividend_history_from_json() -> DividendHistory:
 
 
 class TestScraper:
+    """End-to-end scraper tests against live and locally served pages.
+
+    The live test hits dividendhistory.org directly and is gated behind a
+    ``pytest -m live`` marker. The offline test redirects the browser to a
+    locally served copy of the AAPL page so it can run without network access.
+    """
+
     @pytest.mark.live
     def test_scrape_ko_ticker_live(self):
         """Tests the live version of the dividendhistory.org page for the Coca Cola
@@ -174,6 +181,7 @@ class TestScraperOpenPage:
     def test_open_page_raises_scraper_timeout_after_exhausting_retries(
         self, mocker: MockFixture
     ):
+        """Verify TimeoutException on every attempt surfaces as ScraperTimeoutError."""
         mocker.patch("scraper.scraper.time.sleep")
 
         mock_open_page = mocker.patch(
@@ -191,6 +199,7 @@ class TestScraperOpenPage:
     def test_open_page_raises_scraper_unavailable_on_webdriver_error(
         self, mocker: MockFixture
     ):
+        """Verify WebDriverException on every attempt surfaces as ScraperUnavailableError."""
         mocker.patch("scraper.scraper.time.sleep")
 
         mock_open_page = mocker.patch(
@@ -205,6 +214,7 @@ class TestScraperOpenPage:
         assert mock_open_page.call_count == _MAX_RETRIES
 
     def test_open_page_succeeds_after_transient_timeout(self, mocker: MockFixture):
+        """Verify a single transient TimeoutException is retried and scraping continues."""
         mocker.patch("scraper.scraper.time.sleep")
 
         mock_open_page = mocker.patch(
@@ -245,6 +255,7 @@ class TestScraperOpenPage:
         assert dividend_history is sentinel_history
 
     def test_stock_info_timeout_raises_ticker_not_found(self, mocker: MockFixture):
+        """Verify a TimeoutException on the stock info element raises TickerNotFoundError."""
         mocker.patch.object(SeleniumWrapper, "open_page")
         mock_get_stock_info_html = mocker.patch.object(
             DividendHistoryPage,
@@ -266,6 +277,7 @@ class TestStockMetrics:
     """
 
     def test_metrics_timeout_raises_ticker_has_no_dividends(self, mocker: MockFixture):
+        """Verify a TimeoutException on the metrics table raises TickerHasNoDividends."""
         mocker.patch.object(SeleniumWrapper, "open_page")
         mocker.patch.object(
             DividendHistoryPage,
@@ -297,6 +309,7 @@ class TestStaleElements:
     """
 
     def test_stale_element_retries_then_raises_parse_error(self, mocker: MockFixture):
+        """Verify StaleElementReferenceException on every attempt surfaces as ParseError."""
         mocker.patch.object(SeleniumWrapper, "open_page")
         mock_get_stock_info = mocker.patch.object(
             scraper_module,
@@ -310,6 +323,7 @@ class TestStaleElements:
         assert mock_get_stock_info.call_count == _MAX_RETRIES
 
     def test_stale_element_recovers_on_retry(self, mocker: MockFixture):
+        """Verify a single StaleElementReferenceException is retried and scraping continues."""
         mocker.patch.object(SeleniumWrapper, "open_page")
 
         sentinel_stock_info = StockInfo(
