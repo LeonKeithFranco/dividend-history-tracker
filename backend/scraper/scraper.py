@@ -386,10 +386,33 @@ def get_dividend_info(
 async def async_get_dividend_info(
     ticker: str,
 ) -> tuple[StockInfo, DividendMetrics, DividendHistory]:
+    """Async wrapper around get_dividend_info.
+
+    Delegates to the synchronous scraper in a separate thread so the event
+    loop is not blocked by Selenium's browser automation.
+
+    Args:
+        ticker: The ticker symbol to retrieve dividend information for.
+
+    Returns:
+        tuple: A tuple of (StockInfo, DividendMetrics, DividendHistory).
+    """
     return await asyncio.to_thread(get_dividend_info, ticker)
 
 
 def get_just_dividend_history(ticker: str) -> DividendHistory:
+    """Retrieve only the dividend event history for a ticker, skipping metrics.
+
+    Used during cache refreshes where stock info and metrics are already
+    persisted and only new dividend events need to be fetched.
+
+    Args:
+        ticker: The ticker symbol to retrieve dividend history for.
+
+    Returns:
+        DividendHistory: The complete dividend event history from the data
+            source.
+    """
     DIVIDEND_HISTORY_URL = f"https://dividendhistory.org/payout/{ticker.upper()}/"
 
     with SeleniumWrapper() as driver:
@@ -411,4 +434,16 @@ def get_just_dividend_history(ticker: str) -> DividendHistory:
 
 
 async def async_get_just_dividend_history(ticker: str) -> DividendHistory:
+    """Async wrapper around get_just_dividend_history.
+
+    Delegates to the synchronous scraper in a separate thread so the event
+    loop is not blocked by Selenium's browser automation.
+
+    Args:
+        ticker: The ticker symbol to retrieve dividend history for.
+
+    Returns:
+        DividendHistory: The complete dividend event history from the data
+            source.
+    """
     return await asyncio.to_thread(get_just_dividend_history, ticker)

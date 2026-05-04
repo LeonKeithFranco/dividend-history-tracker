@@ -27,6 +27,14 @@ from scraper.selenium_wrapper import SeleniumWrapper
 
 @pytest.fixture
 def _aapl_dividend_history_from_json() -> DividendHistory:
+    """Load the expected AAPL dividend history from a JSON fixture.
+
+    Reads the saved fixture file and converts it into a DividendHistory
+    dataclass for comparison against scraper output in offline tests.
+
+    Returns:
+        DividendHistory: The expected dividend history for AAPL.
+    """
     with open(
         Path(__file__).parent.parent.parent / "fixtures" / "aapl_dividend_history.json",
         "r",
@@ -63,7 +71,7 @@ class TestScraper:
         assert stock_info.exchange == "NYSE"
 
         assert dividend_metrics.yield_ > 0
-        assert dividend_metrics.pay_out_ratio > 0
+        assert dividend_metrics.payout_ratio > 0
         assert dividend_metrics.frequency == "Quarterly"
         assert (
             dividend_metrics.next_payout_date >= dividend_metrics.next_ex_dividend_date
@@ -136,7 +144,7 @@ class TestScraper:
         assert stock_info.exchange == "Nasdaq"
 
         assert dividend_metrics.yield_ == 0.38
-        assert dividend_metrics.pay_out_ratio == 13.16
+        assert dividend_metrics.payout_ratio == 13.16
         assert dividend_metrics.frequency == "Quarterly"
         assert dividend_metrics.annual_dividend == Decimal("1.04")
         assert (
@@ -209,7 +217,7 @@ class TestScraperOpenPage:
         )
         sentinel_metrics = DividendMetrics(
             yield_=0.38,
-            pay_out_ratio=13.16,
+            payout_ratio=13.16,
             frequency="Quarterly",
             annual_dividend=Decimal("1.04"),
             next_ex_dividend_date=date(2026, 5, 12),
@@ -251,6 +259,12 @@ class TestScraperOpenPage:
 
 
 class TestStockMetrics:
+    """Failure-mode tests for the dividend metrics extraction.
+
+    Verifies that a TimeoutException on the metrics table element is correctly
+    translated into TickerHasNoDividends without retries.
+    """
+
     def test_metrics_timeout_raises_ticker_has_no_dividends(self, mocker: MockFixture):
         mocker.patch.object(SeleniumWrapper, "open_page")
         mocker.patch.object(
@@ -275,6 +289,13 @@ class TestStockMetrics:
 
 
 class TestStaleElements:
+    """Tests for StaleElementReferenceException retry behaviour.
+
+    Verifies that stale element errors are retried up to _MAX_RETRIES times
+    and surface as ParseError if all retries are exhausted, but recover
+    normally if a retry succeeds.
+    """
+
     def test_stale_element_retries_then_raises_parse_error(self, mocker: MockFixture):
         mocker.patch.object(SeleniumWrapper, "open_page")
         mock_get_stock_info = mocker.patch.object(
@@ -296,7 +317,7 @@ class TestStaleElements:
         )
         sentinel_metrics = DividendMetrics(
             yield_=0.38,
-            pay_out_ratio=13.16,
+            payout_ratio=13.16,
             frequency="Quarterly",
             annual_dividend=Decimal("1.04"),
             next_ex_dividend_date=date(2026, 5, 12),

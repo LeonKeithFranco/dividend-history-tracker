@@ -19,6 +19,15 @@ def mock_async_get_dividend_info(
     mocker: MockerFixture,
     mock_scraper_response: tuple[StockInfo, DividendMetrics, DividendHistory],
 ) -> MagicMock:
+    """Patch async_get_dividend_info to return canned scraper data.
+
+    Prevents any real browser or network activity during integration tests.
+    The mock is configured to return the composite mock_scraper_response
+    fixture.
+
+    Returns:
+        MagicMock: The patched function, useful for call-count assertions.
+    """
     return mocker.patch.object(
         service,
         "async_get_dividend_info",
@@ -27,6 +36,13 @@ def mock_async_get_dividend_info(
 
 
 class TestGetDividendHistory:
+    """Integration tests for the GET /dividends/{ticker} endpoint.
+
+    Each test uses an in-memory SQLite database and a mocked scraper. Tests
+    verify cache-miss behaviour, cache-hit behaviour, and the mapping of
+    scraper domain exceptions to the correct HTTP status codes.
+    """
+
     def test_cache_miss_scrapes_and_returns_200(
         self,
         client: TestClient,

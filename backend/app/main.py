@@ -70,6 +70,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 
 @app.get("/")
 async def root():
+    """Health-check endpoint."""
     return {"message": "Hello world"}
 
 
@@ -79,4 +80,19 @@ async def get_dividend_history(
     service: DividendHistoryServiceDependency,
     background_tasks: BackgroundTasks,
 ):
+    """Return the full dividend history for a US stock ticker.
+
+    Cache behaviour depends on the age of the stored data: fresh data is
+    returned immediately, stale data is returned with a background refresh
+    scheduled, and expired or missing data blocks on a live scrape.
+
+    Args:
+        ticker: The stock ticker symbol to look up (e.g. AAPL, KO).
+        service: The injected DividendHistoryService instance.
+        background_tasks: FastAPI BackgroundTasks for scheduling deferred
+            refreshes.
+
+    Returns:
+        StockDividendHistoryResponse: The stock's dividend history.
+    """
     return await service.get_dividend_history(ticker, background_tasks)

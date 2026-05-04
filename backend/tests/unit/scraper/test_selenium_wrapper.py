@@ -6,6 +6,13 @@ from scraper.selenium_wrapper import SeleniumWrapper
 
 
 class TestSeleniumWrapper:
+    """Tests for the SeleniumWrapper utility methods.
+
+    Each test runs against a locally served copy of the AAPL dividend history
+    page (opened automatically by the _setup fixture) so no external network
+    access is required.
+    """
+
     @pytest.fixture(autouse=True)
     def _setup(self, selenium_wrapper: SeleniumWrapper, local_web_server: str):
         """Opens up the local version of the AAPL dividend history page."""

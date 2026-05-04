@@ -21,6 +21,17 @@ from scraper import DividendEvent, DividendHistory, DividendMetrics, StockInfo
 
 
 def _run_async(coro: Coroutine[Any, Any, Any]) -> Any:
+    """Run an async coroutine synchronously in a new event loop.
+
+    Used to execute async setup and teardown operations (e.g. creating tables,
+    disposing engines) from synchronous pytest fixtures.
+
+    Args:
+        coro: The coroutine to execute.
+
+    Returns:
+        Any: The return value of the coroutine.
+    """
     loop = asyncio.new_event_loop()
     try:
         return loop.run_until_complete(coro)
@@ -29,12 +40,27 @@ def _run_async(coro: Coroutine[Any, Any, Any]) -> Any:
 
 
 async def _create_tables(engine: AsyncEngine) -> None:
+    """Create all ORM tables in the given engine's database.
+
+    Args:
+        engine: The async SQLAlchemy engine to create tables against.
+    """
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
 
 @pytest.fixture
 def client() -> Iterator[TestClient]:
+    """Provide a FastAPI TestClient backed by an in-memory SQLite database.
+
+    Creates a fresh in-memory database for each test, overrides the get_db
+    dependency to use it, and cleans up the engine after the test completes.
+    Uses StaticPool so the same in-memory database is shared across the
+    synchronous TestClient and the async application code.
+
+    Yields:
+        TestClient: A configured test client for the FastAPI application.
+    """
     test_engine = create_async_engine(
         "sqlite+aiosqlite://",
         connect_args={"check_same_thread": False},
@@ -113,4 +139,9 @@ def mock_scraper_response(
     mock_dividend_metrics: DividendMetrics,
     mock_dividend_history: DividendHistory,
 ) -> tuple[StockInfo, DividendMetrics, DividendHistory]:
+    """Composite fixture bundling stock info, metrics, and history into a tuple.
+
+    Matches the return type of get_dividend_info so it can be used directly
+    as a mock return value.
+    """
     return (mock_stock_info, mock_dividend_metrics, mock_dividend_history)

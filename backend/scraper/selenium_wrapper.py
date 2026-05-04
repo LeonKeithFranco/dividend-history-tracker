@@ -85,6 +85,23 @@ class SeleniumWrapper:
     def find_element_with_wait(
         self, by: str, value: str, timeout: float = 10.0
     ) -> WebElement:
+        """Wait for an element to be present in the DOM and return it.
+
+        Polls the page until the element matching the locator appears or the
+        timeout is reached.
+
+        Args:
+            by: A locator strategy from selenium.webdriver.common.by.By
+                (e.g, By.ID, By.XPATH, By.CSS_SELECTOR).
+            value: The locator value used with the specified strategy.
+            timeout: Maximum number of seconds to wait before raising.
+
+        Returns:
+            WebElement: The located element.
+
+        Raises:
+            TimeoutException: If the element is not found within the timeout.
+        """
         wait = WebDriverWait(driver=self.driver, timeout=timeout)
 
         element = wait.until(EC.presence_of_element_located((by, value)))
