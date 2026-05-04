@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
-from pytest_mock import MockerFixture, MockFixture
+from pytest_mock import MockerFixture
 
 from scraper import DividendHistory, DividendMetrics, StockInfo
 
