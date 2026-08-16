@@ -4,7 +4,7 @@ A FastAPI service that scrapes, caches, and serves dividend histories for US sto
 
 ## What problem this solves
 
-This app makes it easier to access dividend information. This service scrapes dividend history from [DividendHistory.org](https://dividendhistory.org/), caches it in SQLite with configurable staleness thresholds, and exposes it through a REST API. The scarper is built for reliability; it implements retry logic, exponential backoff, and faile-mode tests. This solves the problem of scarping the page not just once, but scraping it reliably over multiple times.
+This app makes it easier to access dividend information. This service scrapes dividend history from [DividendHistory.org](https://dividendhistory.org/), caches it in SQLite with configurable staleness thresholds, and exposes it through a REST API. The scraper is built for reliability; it implements retry logic, exponential backoff, and failure-mode tests. This solves the problem of scraping the page not just once, but scraping it reliably over multiple times.
 
 ## Architecture
 
