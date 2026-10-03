@@ -35,7 +35,7 @@ class DividendEvent(Base):
     ex_dividend_date: Mapped[date]
     payout_date: Mapped[date]
     cash_amount: Mapped[Decimal] = mapped_column(
-        Numeric(10, 2),
+        Numeric(10, 6),
     )
     pct_change: Mapped[float | None]
 

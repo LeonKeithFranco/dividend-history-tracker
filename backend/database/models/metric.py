@@ -39,7 +39,7 @@ class DividendMetric(Base):
         String(10),
     )
     annual_dividend: Mapped[Decimal] = mapped_column(
-        Numeric(10, 2),
+        Numeric(10, 6),
     )
     next_ex_dividend_date: Mapped[date]
     next_payout_date: Mapped[date]

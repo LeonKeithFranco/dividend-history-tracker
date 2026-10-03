@@ -2,7 +2,6 @@ from http import HTTPStatus
 
 import httpx
 import streamlit as st
-
 from src.api import BackendAPI
 from src.settings import get_settings
 
@@ -57,7 +56,7 @@ match response.status_code:
                 "ex_dividend_date": st.column_config.DateColumn("Ex-Dividend Date"),
                 "payout_date": st.column_config.DateColumn("Payout Date"),
                 "cash_amount": st.column_config.NumberColumn(
-                    "Amount ($)", format="%.2f"
+                    "Amount ($)", format="%.6f"
                 ),
                 "pct_change": st.column_config.NumberColumn(
                     "Change (%)", format="%.1f"
