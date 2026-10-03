@@ -1,40 +1,43 @@
 from datetime import UTC, datetime, timedelta
 from typing import Annotated, cast
 
+from database.db import AsyncSessionFactory
+from database.models import Stock
 from fastapi import BackgroundTasks, Depends
+from scraper import async_get_dividend_info
+from scraper.scraper import async_get_just_dividend_history
 
 from app.domain.repository import StockRepoDependency, StockRepository
 from app.domain.schemas import StockDividendHistoryResponse
-from database.db import AsyncSessionFactory
-from database.models import Stock
-from scraper import async_get_dividend_info
-from scraper.scraper import async_get_just_dividend_history
 
 
 async def _do_refresh(ticker: str, stock_repo: StockRepository) -> None:
     """Re-scrape dividend events for a ticker and persist any new ones.
 
-    Fetches the latest dividend history from the data source, compares it
-    against the most recent event already stored, and inserts only the events
-    that are newer. Updates the stock's date_refreshed timestamp.
+    Fetches the latest dividend history from the data source and inserts
+    every event whose ex-dividend date is not already stored for the stock.
+    Dates that appear more than once in the scrape are inserted only once,
+    so the (stock_id, ex_dividend_date) unique constraint is never violated.
+    Updates the stock's date_refreshed timestamp.
 
     Args:
-        ticker: The ticker symbol to refresh.
+        ticker: The ticker symbol to refresh. Must match the stored ticker
+            symbol (upper case).
         stock_repo: The repository instance to use for database access.
     """
     new_dividend_history = await async_get_just_dividend_history(ticker)
 
     stock = cast(Stock, await stock_repo.get_stock(ticker))
 
-    latest_ex_dividend_date = (
-        stock.events[-1].ex_dividend_date if stock.events else datetime.min
-    )
+    existing_dates = {event.ex_dividend_date for event in stock.events}
 
-    new_dividend_events = [
-        event
-        for event in new_dividend_history.dividend_events
-        if event.ex_dividend_date > latest_ex_dividend_date
-    ]
+    new_dividend_events = []
+    for event in new_dividend_history.dividend_events:
+        if event.ex_dividend_date in existing_dates:
+            continue
+
+        new_dividend_events.append(event)
+        existing_dates.add(event.ex_dividend_date)
 
     stock.date_refreshed = datetime.now(UTC)
     await stock_repo.insert_new_dividend_events(stock, new_dividend_events)
