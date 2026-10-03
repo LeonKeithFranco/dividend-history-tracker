@@ -1,8 +1,5 @@
 from fastapi import BackgroundTasks, FastAPI, Request, status
 from fastapi.responses import JSONResponse
-
-from app.domain.schemas import StockDividendHistoryResponse
-from app.domain.service import DividendHistoryServiceDependency
 from scraper.errors import (
     ParseError,
     ScraperTimeoutError,
@@ -10,6 +7,9 @@ from scraper.errors import (
     TickerHasNoDividends,
     TickerNotFoundError,
 )
+
+from app.domain.schemas import StockDividendHistoryResponse
+from app.domain.service import DividendHistoryServiceDependency
 
 app = FastAPI()
 
@@ -95,4 +95,4 @@ async def get_dividend_history(
     Returns:
         StockDividendHistoryResponse: The stock's dividend history.
     """
-    return await service.get_dividend_history(ticker, background_tasks)
+    return await service.get_dividend_history(ticker.strip().upper(), background_tasks)
