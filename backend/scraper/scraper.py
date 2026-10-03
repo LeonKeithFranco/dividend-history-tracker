@@ -198,6 +198,8 @@ def _get_dividend_metrics(
 
     Raises:
         TickerHasNoDividends: If the dividend metrics table is not found on the page.
+        ParseError: If the metrics table is present but its values cannot be
+            parsed (e.g. "--" for a stock that has suspended its dividend).
     """
     try:
         dividend_metrics_table_html = (
@@ -216,20 +218,23 @@ def _get_dividend_metrics(
         metric.text.strip() for metric in dividend_metrics_table_soup.find_all("dd")
     ]
 
-    return DividendMetrics(
-        yield_=_parse_pct(metrics_text[0]),
-        payout_ratio=_parse_pct(metrics_text[2]),
-        frequency=metrics_text[3],
-        annual_dividend=_parse_cash_amount(metrics_text[4]),
-        next_ex_dividend_date=datetime.strptime(
-            cast(str, _extract_date(metrics_text[5])),
-            _DATE_FORMAT,
-        ).date(),
-        next_payout_date=datetime.strptime(
-            cast(str, _extract_date(metrics_text[6])),
-            _DATE_FORMAT,
-        ).date(),
-    )
+    try:
+        return DividendMetrics(
+            yield_=_parse_pct(metrics_text[0]),
+            payout_ratio=_parse_pct(metrics_text[2]),
+            frequency=metrics_text[3],
+            annual_dividend=_parse_cash_amount(metrics_text[4]),
+            next_ex_dividend_date=datetime.strptime(
+                cast(str, _extract_date(metrics_text[5])),
+                _DATE_FORMAT,
+            ).date(),
+            next_payout_date=datetime.strptime(
+                cast(str, _extract_date(metrics_text[6])),
+                _DATE_FORMAT,
+            ).date(),
+        )
+    except (TypeError, ValueError, IndexError) as e:
+        raise ParseError("Could not parse dividend metrics") from e
 
 
 def _get_dividend_history(dividend_events_table_html: str) -> DividendHistory:
